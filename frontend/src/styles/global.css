@@ -1,0 +1,492 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--coin-bg);
+  color: var(--coin-text);
+  font-family: var(--coin-font);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--coin-primary-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------------------- brand */
+
+.coin-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* The emblem reads as a struck coin: a soft gradient face, a white rim just
+   inside the dark edge, and a serif "C" engraved at its centre. */
+.coin-brand__mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--coin-primary-ink);
+  background: var(--coin-mark-fill);
+  color: var(--coin-primary-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1;
+  box-shadow:
+    inset 0 0 0 3px rgba(255, 255, 255, 0.85),
+    0 2px 6px rgba(79, 70, 229, 0.18);
+}
+
+/* Gradient wordmark: one accent hue per stretch, tracked tight so it reads as
+   a logo rather than body text. */
+.coin-brand__name {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background-image: linear-gradient(100deg, var(--coin-primary), var(--coin-mint) 52%, var(--coin-amber));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--coin-primary);
+}
+
+/* Small-caps kicker under the wordmark. */
+.coin-brand__tag {
+  margin-top: 1px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+/* ------------------------------------------------------------ auth shell */
+
+/* Faint colour blooms keep the white canvas from feeling flat. The flex box
+   centres the brand + card on every screen size and grows (not clips) when the
+   form is taller than the viewport, so the page simply scrolls. */
+.coin-auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 40px 20px;
+  background:
+    radial-gradient(600px 320px at 12% -8%, var(--coin-wash-indigo), transparent 70%),
+    radial-gradient(520px 300px at 100% 8%, var(--coin-wash-mint), transparent 68%),
+    radial-gradient(560px 340px at 50% 118%, var(--coin-wash-amber), transparent 70%),
+    var(--coin-bg);
+}
+
+.coin-auth__card {
+  width: 100%;
+  max-width: 384px;
+  padding: 28px 26px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius-lg);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow);
+}
+
+.coin-auth__title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.coin-auth__subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--coin-text-muted);
+}
+
+.coin-auth__form {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.coin-auth__footer {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--coin-text-soft);
+  text-align: center;
+}
+
+/* Small right-aligned helper row, e.g. the "Forgot password?" link. */
+.coin-auth__meta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -6px;
+  font-size: 13px;
+}
+
+/* Vertical stack for the reset screen's message + token + CTA. */
+.coin-auth__stack {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+/* The raw one-time reset token shown while Chillar has no mail transport. */
+.coin-token {
+  display: block;
+  padding: 10px 12px;
+  border: 1px dashed var(--coin-primary-ink);
+  border-radius: var(--coin-radius-sm);
+  background: var(--coin-primary-soft);
+  color: var(--coin-primary-ink);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+/* ---------------------------------------------------------------- fields */
+
+.coin-field {
+  display: grid;
+  gap: 6px;
+}
+
+.coin-field__label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--coin-text-soft);
+}
+
+.coin-field__input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--coin-border-strong);
+  border-radius: var(--coin-radius-sm);
+  background: var(--coin-bg);
+  color: var(--coin-text);
+  font: inherit;
+  font-size: 14px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.coin-field__input::placeholder {
+  color: var(--coin-text-muted);
+}
+
+.coin-field__input:focus {
+  outline: none;
+  border-color: var(--coin-primary);
+  box-shadow: var(--coin-ring);
+}
+
+.coin-field__input[data-invalid='true'] {
+  border-color: var(--coin-rose);
+}
+
+.coin-field__error {
+  font-size: 12px;
+  color: var(--coin-rose-ink);
+}
+
+.coin-field__hint {
+  font-size: 12px;
+  color: var(--coin-text-muted);
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.coin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--coin-radius-sm);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.coin-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.coin-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--coin-ring);
+}
+
+.coin-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.coin-btn--primary {
+  border-color: var(--coin-primary-ink);
+  background: var(--coin-primary-soft);
+  color: var(--coin-primary-ink);
+}
+
+.coin-btn--primary:hover:not(:disabled) {
+  background: var(--coin-primary-soft-hover);
+}
+
+.coin-btn--mint {
+  border-color: var(--coin-mint-ink);
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+.coin-btn--amber {
+  border-color: var(--coin-amber-ink);
+  background: var(--coin-amber-soft);
+  color: var(--coin-amber-ink);
+}
+
+.coin-btn--ghost {
+  border-color: var(--coin-border-strong);
+  background: var(--coin-surface);
+  color: var(--coin-text-soft);
+}
+
+.coin-btn--ghost:hover:not(:disabled) {
+  border-color: var(--coin-text-muted);
+  background: var(--coin-surface-soft);
+}
+
+.coin-btn--sm {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.coin-btn--block {
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------- alert */
+
+.coin-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid var(--coin-rose-ink);
+  border-radius: var(--coin-radius-sm);
+  background: var(--coin-rose-soft);
+  color: var(--coin-rose-ink);
+  font-size: 13px;
+}
+
+.coin-alert--ok {
+  border-color: var(--coin-mint-ink);
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+/* ------------------------------------------------------- boot + layout */
+
+.coin-boot {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  font-size: 13px;
+  color: var(--coin-text-muted);
+}
+
+.coin-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ------------------------------------------------------------ dashboard */
+
+.coin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--coin-border);
+  background: var(--coin-surface);
+}
+
+.coin-account {
+  text-align: right;
+}
+
+.coin-account__name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.coin-account__email {
+  font-size: 12px;
+  color: var(--coin-text-muted);
+}
+
+.coin-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 22px 60px;
+}
+
+.coin-page__title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.coin-page__subtitle {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--coin-text-muted);
+}
+
+.coin-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  margin-top: 22px;
+}
+
+.coin-tile {
+  position: relative;
+  overflow: hidden;
+  padding: 16px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow-sm);
+}
+
+/* Each tile leans on a different accent, so the grid reads as colourful. */
+.coin-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+}
+
+.coin-tile:nth-child(3n + 1) {
+  background: linear-gradient(180deg, var(--coin-primary-soft), var(--coin-surface) 78%);
+}
+
+.coin-tile:nth-child(3n + 2) {
+  background: linear-gradient(180deg, var(--coin-mint-soft), var(--coin-surface) 78%);
+}
+
+.coin-tile:nth-child(3n + 3) {
+  background: linear-gradient(180deg, var(--coin-amber-soft), var(--coin-surface) 78%);
+}
+
+.coin-tile:nth-child(3n + 1)::before {
+  background: var(--coin-primary);
+}
+
+.coin-tile:nth-child(3n + 2)::before {
+  background: var(--coin-mint);
+}
+
+.coin-tile:nth-child(3n + 3)::before {
+  background: var(--coin-amber);
+}
+
+.coin-tile__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-tile__value {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.coin-tile__note {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--coin-text-soft);
+}
+
+.coin-section {
+  margin-top: 26px;
+}
+
+.coin-section__title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.coin-empty {
+  margin-top: 10px;
+  padding: 22px;
+  border: 1px dashed var(--coin-border-strong);
+  border-radius: var(--coin-radius);
+  text-align: center;
+  font-size: 13px;
+  color: var(--coin-text-muted);
+}
+
+/* ----------------------------------------------------------- responsive */
+
+@media (max-width: 480px) {
+  .coin-auth {
+    gap: 18px;
+    padding: 28px 16px;
+  }
+
+  .coin-auth__card {
+    padding: 22px 18px;
+  }
+
+  .coin-topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  .coin-page {
+    padding: 22px 16px 48px;
+  }
+
+  .coin-grid {
+    grid-template-columns: 1fr;
+  }
+}

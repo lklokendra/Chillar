@@ -1,0 +1,59 @@
+/*
+ * Chillar design tokens.
+ * One place to change the whole look: minimal white canvas, vibrant accents.
+ * Every accent exposes three values: the hue, a soft background, and a dark ink
+ * used for text + borders (that pair is what the small buttons are built from).
+ */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --coin-bg: #ffffff;
+  --coin-surface: #ffffff;
+  --coin-surface-soft: #fbfbfc;
+  --coin-border: #e8eaee;
+  --coin-border-strong: #d5d9e0;
+
+  /* Text */
+  --coin-text: #14161a;
+  --coin-text-soft: #4b5361;
+  --coin-text-muted: #8a92a0;
+
+  /* Primary - indigo */
+  --coin-primary: #4f46e5;
+  --coin-primary-soft: #eef2ff;
+  --coin-primary-soft-hover: #e3e7ff;
+  --coin-primary-ink: #2f2a8f;
+
+  /* Accent - mint */
+  --coin-mint: #0d9488;
+  --coin-mint-soft: #ecfdf5;
+  --coin-mint-ink: #115e59;
+
+  /* Accent - amber */
+  --coin-amber: #d97706;
+  --coin-amber-soft: #fffbeb;
+  --coin-amber-ink: #8a4b0a;
+
+  /* Accent - rose (also used for errors) */
+  --coin-rose: #e11d48;
+  --coin-rose-soft: #fff1f2;
+  --coin-rose-ink: #9f1239;
+
+  /* Wash - faint colour blooms that sit on the white canvas */
+  --coin-wash-indigo: rgba(79, 70, 229, 0.1);
+  --coin-wash-mint: rgba(13, 148, 136, 0.1);
+  --coin-wash-amber: rgba(217, 119, 6, 0.1);
+  --coin-mark-fill: linear-gradient(135deg, var(--coin-primary-soft), var(--coin-mint-soft) 55%, var(--coin-amber-soft));
+
+  /* Shape + depth */
+  --coin-radius-sm: 6px;
+  --coin-radius: 10px;
+  --coin-radius-lg: 16px;
+  --coin-shadow-sm: 0 1px 2px rgba(20, 22, 26, 0.05);
+  --coin-shadow: 0 8px 24px rgba(20, 22, 26, 0.06);
+  --coin-ring: 0 0 0 3px rgba(79, 70, 229, 0.16);
+
+  /* Type */
+  --coin-font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}

@@ -1,0 +1,34 @@
+server:
+  # 8080 is held by Oracle's TNSLSNR listener on this machine.
+  port: 8081
+
+spring:
+  application:
+    name: chillar-backend
+
+  datasource:
+    url: ${COIN_DB_URL:jdbc:postgresql://localhost:5433/coin}
+    username: ${COIN_DB_USERNAME:coin}
+    password: ${COIN_DB_PASSWORD:coin}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+coin:
+  jwt:
+    # Override in production: must be at least 32 bytes for HS256.
+    secret: ${COIN_JWT_SECRET:coin-dev-only-secret-change-me-32-bytes-min}
+    expiration-minutes: ${COIN_JWT_EXPIRATION_MINUTES:1440}
+  cors:
+    allowed-origins: ${COIN_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  password-reset:
+    expiration-minutes: ${COIN_PASSWORD_RESET_EXPIRATION_MINUTES:30}
+
+logging:
+  level:
+    org.springframework.security: INFO

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: coin-postgres
+    environment:
+      POSTGRES_DB: coin
+      POSTGRES_USER: coin
+      POSTGRES_PASSWORD: coin
+    ports:
+      # Host 5433 avoids clashing with the native PostgreSQL 18 service on 5432.
+      - "5433:5432"
+    volumes:
+      - coin-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coin -d coin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  coin-pgdata:
