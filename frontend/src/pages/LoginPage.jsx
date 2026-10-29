@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext'
 import { errorMessage } from '../api/client'
 
 export default function LoginPage() {
-  const { user, signIn } = useAuth()
+  const { user, signIn, continueAsGuest } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -39,8 +39,13 @@ export default function LoginPage() {
     }
   }
 
+  const handleGuestMode = () => {
+    continueAsGuest()
+    navigate('/')
+  }
+
   return (
-    <AuthShell title="Welcome back" subtitle="Sign in to keep tracking your coins.">
+    <AuthShell title="Welcome back" subtitle="Sign in to your Chillar account.">
       <form className="coin-auth__form" onSubmit={handleSubmit} noValidate>
         {notice && (
           <div className="coin-alert coin-alert--ok" role="status">
@@ -82,6 +87,12 @@ export default function LoginPage() {
 
         <Button type="submit" variant="primary" block disabled={submitting}>
           {submitting ? 'Signing in...' : 'Sign in'}
+        </Button>
+
+        <div style={{ margin: '12px 0', opacity: 0.4, fontSize: '12px' }}>OR</div>
+
+        <Button variant="ghost" block onClick={handleGuestMode}>
+          Continue as Guest
         </Button>
       </form>
 

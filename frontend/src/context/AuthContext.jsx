@@ -6,10 +6,14 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
+  const [isGuest, setIsGuest] = useState(false)
   const [restoring, setRestoring] = useState(true)
 
   // On first paint, try to rebuild the session from a stored token.
   useEffect(() => {
+    const guestFlag = localStorage.getItem('chillar.guest') === 'true'
+    if (guestFlag) setIsGuest(true)
+    
     let cancelled = false
 
     async function restore() {
@@ -43,6 +47,8 @@ export function AuthProvider({ children }) {
     const data = await authApi.login(credentials)
     tokenStore.set(data.token)
     setUser(data.user)
+    setIsGuest(false)
+    localStorage.removeItem('chillar.guest')
     return data.user
   }, [])
 
@@ -50,17 +56,26 @@ export function AuthProvider({ children }) {
     const data = await authApi.register(details)
     tokenStore.set(data.token)
     setUser(data.user)
+    setIsGuest(false)
+    localStorage.removeItem('chillar.guest')
     return data.user
+  }, [])
+
+  const continueAsGuest = useCallback(() => {
+    setIsGuest(true)
+    localStorage.setItem('chillar.guest', 'true')
   }, [])
 
   const signOut = useCallback(() => {
     tokenStore.clear()
     setUser(null)
+    setIsGuest(false)
+    localStorage.removeItem('chillar.guest')
   }, [])
 
   const value = useMemo(
-    () => ({ user, restoring, signIn, signUp, signOut }),
-    [user, restoring, signIn, signUp, signOut],
+    () => ({ user, isGuest, restoring, signIn, signUp, continueAsGuest, signOut }),
+    [user, isGuest, restoring, signIn, signUp, continueAsGuest, signOut],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

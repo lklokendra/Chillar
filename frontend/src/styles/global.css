@@ -22,9 +22,18 @@ body {
 
 h1,
 h2,
-h3,
+h3 {
+  margin: 0;
+  text-transform: lowercase;
+  color: #000;
+  font-weight: 900;
+}
+
 p {
   margin: 0;
+  font-family: var(--coin-font-mono);
+  font-size: 14px;
+  color: #000;
 }
 
 a {
@@ -45,8 +54,6 @@ a:hover {
   gap: 10px;
 }
 
-/* The emblem reads as a struck coin: a soft gradient face, a white rim just
-   inside the dark edge, and a serif "C" engraved at its centre. */
 .coin-brand__mark {
   display: grid;
   place-items: center;
@@ -66,8 +73,6 @@ a:hover {
     0 2px 6px rgba(79, 70, 229, 0.18);
 }
 
-/* Gradient wordmark: one accent hue per stretch, tracked tight so it reads as
-   a logo rather than body text. */
 .coin-brand__name {
   font-size: 17px;
   font-weight: 800;
@@ -79,7 +84,6 @@ a:hover {
   color: var(--coin-primary);
 }
 
-/* Small-caps kicker under the wordmark. */
 .coin-brand__tag {
   margin-top: 1px;
   font-size: 10px;
@@ -104,11 +108,7 @@ a:hover {
   min-height: 100vh;
   min-height: 100dvh;
   padding: 40px 20px;
-  background:
-    radial-gradient(600px 320px at 12% -8%, var(--coin-wash-indigo), transparent 70%),
-    radial-gradient(520px 300px at 100% 8%, var(--coin-wash-mint), transparent 68%),
-    radial-gradient(560px 340px at 50% 118%, var(--coin-wash-amber), transparent 70%),
-    var(--coin-bg);
+  background: var(--coin-bg);
 }
 
 .coin-auth__card {
@@ -182,26 +182,31 @@ a:hover {
 }
 
 .coin-field__label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--coin-text-soft);
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #000;
+  margin-bottom: 4px;
 }
 
 .coin-field__input {
   width: 100%;
-  padding: 9px 11px;
-  border: 1px solid var(--coin-border-strong);
-  border-radius: var(--coin-radius-sm);
-  background: var(--coin-bg);
-  color: var(--coin-text);
-  font: inherit;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fcfcfc;
+  color: #000;
+  font-family: var(--coin-font-mono);
   font-size: 14px;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
 }
 
-.coin-field__input::placeholder {
-  color: var(--coin-text-muted);
+.coin-field__input:focus {
+  outline: none;
+  border-color: #000;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .coin-field__input:focus {
@@ -231,44 +236,75 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 8px 14px;
-  border: 1px solid transparent;
-  border-radius: var(--coin-radius-sm);
-  font: inherit;
-  font-size: 13px;
+  padding: 12px 32px;
+  border: 1px solid #000;
+  border-radius: 9999px;
+  font-family: var(--coin-font-mono);
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
-}
-
-.coin-btn:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.coin-btn:focus-visible {
-  outline: none;
-  box-shadow: var(--coin-ring);
-}
-
-.coin-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
+  transition: all 0.2s ease;
 }
 
 .coin-btn--primary {
-  border-color: var(--coin-primary-ink);
-  background: var(--coin-primary-soft);
-  color: var(--coin-primary-ink);
+  background: #000;
+  color: #fff;
 }
 
 .coin-btn--primary:hover:not(:disabled) {
-  background: var(--coin-primary-soft-hover);
+  background: #333;
 }
 
-.coin-btn--mint {
-  border-color: var(--coin-mint-ink);
-  background: var(--coin-mint-soft);
-  color: var(--coin-mint-ink);
+/* Pill/Badge styles from screenshots */
+.coin-pill {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-family: var(--coin-font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 12px;
+}
+
+.coin-khata-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.coin-khata-item:hover {
+  opacity: 0.7;
+}
+
+.coin-entry-input {
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  font-size: 32px;
+  font-weight: 900;
+  color: #ccc;
+  outline: none;
+  background: transparent;
+}
+
+.coin-entry-input:focus {
+  color: #000;
+}
+
+.coin-entry-input::placeholder {
+  color: #eee;
+}
+
+.coin-pill--mint { background: #e0f2f1; color: #000; }
+.coin-pill--yellow { background: #fffde7; color: #000; }
+.coin-pill--blue { background: #e3f2fd; color: #000; }
+.coin-pill--rose { background: #fff1f2; color: #000; }
+.coin-pill--ghost {
+  border: 1px solid #eee;
+  background: transparent;
+  color: #aaa;
 }
 
 .coin-btn--amber {
@@ -362,6 +398,22 @@ a:hover {
   max-width: 900px;
   margin: 0 auto;
   padding: 30px 22px 60px;
+  position: relative;
+}
+
+.coin-search-bar {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  font-family: var(--coin-font-mono);
+  font-size: 13px;
+  margin-bottom: 24px;
+  outline: none;
+}
+
+.coin-search-bar:focus {
+  border-color: #000;
 }
 
 .coin-page__title {
@@ -386,51 +438,30 @@ a:hover {
 .coin-tile {
   position: relative;
   overflow: hidden;
-  padding: 16px;
-  border: 1px solid var(--coin-border);
-  border-radius: var(--coin-radius);
-  background: var(--coin-surface);
-  box-shadow: var(--coin-shadow-sm);
+  padding: 24px;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fff;
+  transition: all 0.2s ease;
 }
 
-/* Each tile leans on a different accent, so the grid reads as colourful. */
-.coin-tile::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 3px;
+.coin-tile:hover {
+  border-color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
 }
 
-.coin-tile:nth-child(3n + 1) {
-  background: linear-gradient(180deg, var(--coin-primary-soft), var(--coin-surface) 78%);
-}
-
-.coin-tile:nth-child(3n + 2) {
-  background: linear-gradient(180deg, var(--coin-mint-soft), var(--coin-surface) 78%);
-}
-
-.coin-tile:nth-child(3n + 3) {
-  background: linear-gradient(180deg, var(--coin-amber-soft), var(--coin-surface) 78%);
-}
-
-.coin-tile:nth-child(3n + 1)::before {
-  background: var(--coin-primary);
-}
-
-.coin-tile:nth-child(3n + 2)::before {
-  background: var(--coin-mint);
-}
-
-.coin-tile:nth-child(3n + 3)::before {
-  background: var(--coin-amber);
-}
+.coin-tile:nth-child(3n + 1) { border-top: 4px solid #e0f2f1; }
+.coin-tile:nth-child(3n + 2) { border-top: 4px solid #fffde7; }
+.coin-tile:nth-child(3n + 3) { border-top: 4px solid #e3f2fd; }
 
 .coin-tile__label {
+  font-family: var(--coin-font-mono);
   font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--coin-text-muted);
+  color: #000;
+  opacity: 0.5;
 }
 
 .coin-tile__value {

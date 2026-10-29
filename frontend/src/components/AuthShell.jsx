@@ -4,7 +4,7 @@ export default function AuthShell({ title, subtitle, children }) {
       <div className="coin-brand">
         <span className="coin-brand__mark">C</span>
         <div>
-          <div className="coin-brand__name">Chillar</div>
+          <div className="coin-brand__name">chillar</div>
           <div className="coin-brand__tag">Track every coin</div>
         </div>
       </div>

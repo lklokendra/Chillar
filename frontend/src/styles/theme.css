@@ -56,4 +56,5 @@
 
   /* Type */
   --coin-font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --coin-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
