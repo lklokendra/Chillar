@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -86,6 +87,22 @@ public class AuthService {
 
         User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Incorrect email or password"));
+
+        return issueToken(user);
+    }
+
+    /**
+     * Spins up a throwaway account so "continue as guest" still gets a real
+     * bearer token and its entries land in the database like any other user.
+     */
+    @Transactional
+    public AuthResponse guest() {
+        User user = new User();
+        user.setName("Guest");
+        user.setEmail("guest-" + UUID.randomUUID() + "@chillar.local");
+        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        user.setRole(Role.USER);
+        userRepository.save(user);
 
         return issueToken(user);
     }

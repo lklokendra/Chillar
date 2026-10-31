@@ -61,9 +61,14 @@ export function AuthProvider({ children }) {
     return data.user
   }, [])
 
-  const continueAsGuest = useCallback(() => {
+  const continueAsGuest = useCallback(async () => {
+    // Guests still get a real (throwaway) account so their khata lives in the DB.
+    const data = await authApi.guestLogin()
+    tokenStore.set(data.token)
+    setUser(data.user)
     setIsGuest(true)
     localStorage.setItem('chillar.guest', 'true')
+    return data.user
   }, [])
 
   const signOut = useCallback(() => {

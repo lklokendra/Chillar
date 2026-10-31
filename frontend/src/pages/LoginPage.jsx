@@ -39,9 +39,17 @@ export default function LoginPage() {
     }
   }
 
-  const handleGuestMode = () => {
-    continueAsGuest()
-    navigate('/')
+  const handleGuestMode = async () => {
+    setError('')
+    setSubmitting(true)
+    try {
+      await continueAsGuest()
+      navigate('/', { replace: true })
+    } catch (err) {
+      setError(errorMessage(err, 'Could not start guest mode. Please try again.'))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (

@@ -1,66 +1,129 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
+import Brand from '../components/Brand'
+import KhataAccordion from '../components/KhataAccordion'
 import { useAuth } from '../context/AuthContext'
 import * as transactionApi from '../api/transactions'
 import { errorMessage } from '../api/client'
+import {
+  buildSuggestions,
+  formatDate,
+  tagInInput,
+  todayIso,
+  withTag,
+  withoutTag,
+} from '../utils/entry'
 
 export default function DashboardPage() {
+  const navigate = useNavigate()
   const { user, isGuest, signOut } = useAuth()
-  const [selectedKhata, setSelectedKhata] = useState('all')
   const [khatas, setKhatas] = useState([])
   const [transactions, setTransactions] = useState([])
   const [entryInput, setEntryInput] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [entryDate, setEntryDate] = useState(todayIso())
+  const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
+  const [notice, setNotice] = useState('')
+  const [deletingId, setDeletingId] = useState(null)
+  const [expandedKhata, setExpandedKhata] = useState(null)
+  const inputRef = useRef(null)
 
   const firstName = isGuest ? 'Guest' : (user?.name?.split(' ')[0] ?? 'there')
+  const totalAll = Number(khatas.find((k) => k.name === 'all')?.total ?? 0)
+  const spendKhatas = khatas.filter((k) => k.name !== 'all')
+  const topKhata = [...spendKhatas].sort((a, b) => Number(b.total) - Number(a.total))[0]
+  const entryCount = transactions.length
+  const activeTag = tagInInput(entryInput)
+  const suggestions = buildSuggestions(spendKhatas)
+
+  const entriesByKhata = {}
+  for (const transaction of transactions) {
+    if (!entriesByKhata[transaction.categoryName]) {
+      entriesByKhata[transaction.categoryName] = []
+    }
+    entriesByKhata[transaction.categoryName].push(transaction)
+  }
 
   useEffect(() => {
-    loadKhatas()
+    refresh()
   }, [])
 
-  useEffect(() => {
-    loadTransactions(selectedKhata)
-  }, [selectedKhata])
-
-  async function loadKhatas() {
+  async function refresh() {
     try {
-      const data = await transactionApi.getKhatas()
-      setKhatas(data)
+      const [khataData, transactionData] = await Promise.all([
+        transactionApi.getKhatas(),
+        transactionApi.getTransactions(),
+      ])
+      setKhatas(khataData)
+      setTransactions(transactionData)
     } catch (err) {
-      console.error(err)
+      setError(errorMessage(err))
     }
   }
 
-  async function loadTransactions(category) {
-    setLoading(true)
+  async function submitEntry() {
+    const value = entryInput.trim()
+    if (!value || saving) return
+
+    setSaving(true)
+    setError('')
+    setNotice('')
     try {
-      const data = await transactionApi.getTransactions(category)
-      setTransactions(data)
+      const saved = await transactionApi.addEntry(value, entryDate)
+      setEntryInput('')
+      setNotice(
+        `Logged ₹${Number(saved.amount).toLocaleString()}${saved.note ? ` · ${saved.note}` : ''} on ${formatDate(saved.date)}`,
+      )
+      await refresh()
     } catch (err) {
       setError(errorMessage(err))
     } finally {
-      setLoading(false)
+      setSaving(false)
     }
   }
 
-  async function handleEntrySubmit(e) {
-    if (e.key === 'Enter' && entryInput.trim()) {
-      try {
-        await transactionApi.addEntry(entryInput)
-        setEntryInput('')
-        loadKhatas()
-        loadTransactions(selectedKhata)
-      } catch (err) {
-        setError(errorMessage(err))
-      }
+  function handleEntrySubmit(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      submitEntry()
+    }
+  }
+
+  /** Clicking a suggested khata tags the entry without typing the "#". */
+  function applyCategory(name) {
+    setEntryInput(activeTag === name.toLowerCase() ? withoutTag(entryInput) : withTag(entryInput, name))
+    inputRef.current?.focus()
+  }
+
+  function toggleKhata(name) {
+    setExpandedKhata((current) => (current === name ? null : name))
+  }
+
+  async function handleDelete(transaction) {
+    const label = transaction.note || transaction.categoryName || 'this entry'
+    if (!window.confirm(`Delete "${label}" (₹${Number(transaction.amount).toLocaleString()})?`)) {
+      return
+    }
+
+    setDeletingId(transaction.id)
+    setError('')
+    setNotice('')
+    try {
+      await transactionApi.deleteTransaction(transaction.id)
+      setNotice(`Deleted "${label}"`)
+      await refresh()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setDeletingId(null)
     }
   }
 
   return (
     <div className="coin-page">
-      <header className="coin-topbar" style={{ padding: '14px 0', border: 'none', justifyContent: 'flex-end' }}>
+      <header className="coin-topbar" style={{ padding: '14px 0', border: 'none', justifyContent: 'space-between' }}>
+        <Brand showTag={false} />
         <Button variant="ghost" size="sm" onClick={signOut}>
           Sign out
         </Button>
@@ -72,99 +135,126 @@ export default function DashboardPage() {
           {isGuest ? 'You are exploring Chillar as a guest.' : 'Welcome back to your khata.'}
         </p>
 
-        {/* Prominent One-line Entry Input */}
-        <div style={{ marginBottom: '48px', textAlign: 'left' }}>
+        {/* Suggested khatas — tap one instead of typing "#name". */}
+        {suggestions.length > 0 && (
+          <div className="coin-suggest">
+            <span className="coin-suggest__label">tap to tag</span>
+            <div className="coin-suggest__chips">
+              {suggestions.map((suggestion) => (
+                <button
+                  key={suggestion.name}
+                  type="button"
+                  className={`coin-suggest__chip coin-suggest__chip--${suggestion.color} ${
+                    activeTag === suggestion.name.toLowerCase() ? 'is-active' : ''
+                  }`}
+                  onClick={() => applyCategory(suggestion.name)}
+                >
+                  #{suggestion.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Prominent one-line entry — no add button, just type and hit enter. */}
+        <div className="coin-entry-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '32px', fontWeight: '900' }}>₹</span>
             <input
+              ref={inputRef}
               className="coin-entry-input"
               placeholder="100 chai #office"
               value={entryInput}
               onChange={(e) => setEntryInput(e.target.value)}
               onKeyDown={handleEntrySubmit}
+              disabled={saving}
             />
           </div>
-          <p style={{ marginTop: '8px', opacity: 0.4, fontSize: '12px', fontFamily: 'var(--coin-font-mono)' }}>
-            Press enter to log directly
-          </p>
+
+          <div className="coin-entry-meta">
+            <label className="coin-entry-date">
+              <span>date</span>
+              <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
+            </label>
+            <p className="coin-entry-hint">
+              numbers → money · words → note · #tag → category · press enter to log
+            </p>
+          </div>
         </div>
 
-        {/* Total Spend Summary Tiles */}
-        <div className="coin-grid" style={{ marginBottom: '48px' }}>
-          <div className="coin-tile" style={{ borderTop: '4px solid #000' }}>
+        {notice && (
+          <div className="coin-alert coin-alert--ok" role="status" style={{ marginTop: '12px' }}>
+            {notice}
+          </div>
+        )}
+        {error && (
+          <div className="coin-alert" role="alert" style={{ marginTop: '12px' }}>
+            {error}
+          </div>
+        )}
+
+        {/* Totals */}
+        <div className="coin-grid" style={{ marginTop: '28px', marginBottom: '44px' }}>
+          <div className="coin-tile coin-tile--ink">
             <div className="coin-tile__label">Total Spends</div>
-            <div className="coin-tile__value">₹ {khatas.find(k => k.name === 'all')?.total?.toLocaleString() || '0'}</div>
+            <div className="coin-tile__value">₹ {totalAll.toLocaleString()}</div>
             <div className="coin-tile__note">Combined across all khatas</div>
           </div>
-          <div className="coin-tile" style={{ borderTop: '4px solid var(--coin-mint)' }}>
+          <div className="coin-tile coin-tile--mint">
             <div className="coin-tile__label">Top Category</div>
             <div className="coin-tile__value" style={{ fontSize: '18px', textTransform: 'capitalize' }}>
-              {khatas.filter(k => k.name !== 'all').sort((a, b) => b.total - a.total)[0]?.name || 'None'}
+              {topKhata?.name || 'None'}
             </div>
-            <div className="coin-tile__note">Highest spending this month</div>
+            <div className="coin-tile__note">
+              {topKhata ? `₹ ${Number(topKhata.total).toLocaleString()} spent` : 'No spending yet'}
+            </div>
+          </div>
+          <div className="coin-tile coin-tile--blue">
+            <div className="coin-tile__label">Entries</div>
+            <div className="coin-tile__value">{entryCount}</div>
+            <div className="coin-tile__note">
+              across {spendKhatas.length} {spendKhatas.length === 1 ? 'khata' : 'khatas'}
+            </div>
           </div>
         </div>
 
         <div className="coin-pill coin-pill--mint">#all</div>
-        <h1 style={{ fontSize: '48px', marginTop: '12px', marginBottom: '40px' }}>khatas</h1>
-        
-        <div style={{ display: 'grid', gap: '32px' }}>
-          {khatas.filter(k => k.name !== 'all').map(khata => (
-            <div 
-              key={khata.name} 
-              className="coin-khata-item"
-              onClick={() => {
-                setSelectedKhata(khata.name)
-              }}
-              style={{ borderLeft: selectedKhata === khata.name ? '3px solid #000' : 'none', paddingLeft: selectedKhata === khata.name ? '12px' : '0' }}
-            >
-              <div className={`coin-pill coin-pill--${khata.color}`}>#{khata.name}</div>
-              <div style={{ fontSize: '20px', fontWeight: '600', fontFamily: 'var(--coin-font-mono)' }}>
-                ₹ {khata.total.toLocaleString()}
-              </div>
-            </div>
+        <h1 style={{ fontSize: '48px', marginTop: '12px', marginBottom: '16px' }}>khatas</h1>
+        <p className="coin-muted" style={{ marginBottom: '32px' }}>
+          tap a khata to see everything spent in it
+        </p>
+
+        <div style={{ display: 'grid', gap: '12px' }}>
+          {spendKhatas.length === 0 && (
+            <div className="coin-muted">No khatas yet. Log something like “100 chai #food”.</div>
+          )}
+
+          {spendKhatas.map((khata) => (
+            <KhataAccordion
+              key={khata.name}
+              khata={khata}
+              entries={entriesByKhata[khata.name] ?? []}
+              isOpen={expandedKhata === khata.name}
+              onToggle={toggleKhata}
+              deletingId={deletingId}
+              onDelete={handleDelete}
+            />
           ))}
-          
-          <div style={{ opacity: 0.2, display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '20px' }}>#</span>
-            <span style={{ fontFamily: 'var(--coin-font-mono)' }}>new space...</span>
-          </div>
         </div>
 
-        {/* Transaction History for selected Khata */}
-        <div style={{ marginTop: '64px' }}>
-          <div className="coin-pill coin-pill--ghost" style={{ background: '#f5f5f5', border: 'none', marginBottom: '24px' }}>
-            #{selectedKhata} history
-          </div>
-          
-          <input 
-            className="coin-search-bar" 
-            placeholder="Search entries..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-
-          <div style={{ marginTop: '20px' }}>
-            {transactions.length > 0 ? (
-              <div style={{ display: 'grid', gap: '20px' }}>
-                {transactions
-                  .filter(t => !searchQuery || (t.note && t.note.toLowerCase().includes(searchQuery.toLowerCase())))
-                  .map(t => (
-                  <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--coin-font-mono)' }}>
-                    <span>{t.note || 'cash'}</span>
-                    <span>₹ {t.amount}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div style={{ opacity: 0.3, fontFamily: 'var(--coin-font-mono)' }}>
-                No entries found in this khata.
-              </div>
-            )}
-          </div>
-        </div>
+        {/* The full log lives on its own page now. */}
+        <button type="button" className="coin-history-btn" onClick={() => navigate('/history')}>
+          <span className="coin-history-btn__text">
+            <span className="coin-history-btn__title">history</span>
+            <span className="coin-history-btn__sub">
+              all khatas · {transactions.length} {transactions.length === 1 ? 'entry' : 'entries'}
+            </span>
+          </span>
+          <span className="coin-history-btn__arrow" aria-hidden="true">
+            →
+          </span>
+        </button>
       </div>
     </div>
   )
 }
-

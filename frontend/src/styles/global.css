@@ -57,38 +57,33 @@ a:hover {
 .coin-brand__mark {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid var(--coin-primary-ink);
-  background: var(--coin-mark-fill);
-  color: var(--coin-primary-ink);
-  font-family: Georgia, 'Times New Roman', serif;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  font-family: var(--coin-font-mono);
   font-size: 18px;
-  font-weight: 700;
-  font-style: italic;
+  font-weight: 900;
   line-height: 1;
-  box-shadow:
-    inset 0 0 0 3px rgba(255, 255, 255, 0.85),
-    0 2px 6px rgba(79, 70, 229, 0.18);
 }
 
 .coin-brand__name {
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  background-image: linear-gradient(100deg, var(--coin-primary), var(--coin-mint) 52%, var(--coin-amber));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: var(--coin-primary);
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  text-transform: lowercase;
+  color: #000;
+  font-family: var(--coin-font);
 }
 
 .coin-brand__tag {
-  margin-top: 1px;
-  font-size: 10px;
+  margin-top: 2px;
+  font-family: var(--coin-font-mono);
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.09em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--coin-text-muted);
 }
@@ -266,16 +261,192 @@ a:hover {
   margin-bottom: 12px;
 }
 
-.coin-khata-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+/* ------------------------------------------------------- khata accordion */
+
+.coin-khata {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
 }
 
-.coin-khata-item:hover {
-  opacity: 0.7;
+.coin-khata:hover {
+  border-color: #ccc;
+}
+
+.coin-khata.is-open {
+  border-color: #000;
+}
+
+.coin-khata__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 16px 18px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.coin-khata__side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.coin-khata__total {
+  font-family: var(--coin-font-mono);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.coin-khata__count {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  opacity: 0.4;
+  white-space: nowrap;
+}
+
+.coin-khata__caret {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #f4f4f4;
+  font-family: var(--coin-font-mono);
+  font-size: 14px;
+  line-height: 1;
+  color: #666;
+}
+
+.coin-khata.is-open .coin-khata__caret {
+  background: #000;
+  color: #fff;
+}
+
+.coin-khata__body {
+  padding: 0 18px 10px;
+  border-top: 1px solid #f5f5f5;
+}
+
+/* Each khata gets a light wash keyed to its badge colour. */
+.coin-khata--mint { background: #f2fbf9; border-color: #d6efe9; }
+.coin-khata--yellow { background: #fffdf3; border-color: #f3ebc9; }
+.coin-khata--blue { background: #f4f9ff; border-color: #d6e6f7; }
+.coin-khata--rose { background: #fff6f7; border-color: #f7d9df; }
+
+.coin-khata--mint.is-open { border-color: #0d9488; }
+.coin-khata--yellow.is-open { border-color: #d97706; }
+.coin-khata--blue.is-open { border-color: #2563eb; }
+.coin-khata--rose.is-open { border-color: #e11d48; }
+
+/* Inline "add an entry to this khata" row inside the dropdown. */
+.coin-khata__add {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 8px;
+}
+
+.coin-khata__add-input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: #000;
+  outline: none;
+}
+
+.coin-khata__add-input:focus {
+  border-color: #000;
+  background: #fff;
+}
+
+.coin-khata__add-btn {
+  flex-shrink: 0;
+  padding: 0 16px;
+  border: 1px solid #000;
+  border-radius: 8px;
+  background: #000;
+  color: #fff;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.coin-khata__add-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* --------------------------------------------------- khata suggestions */
+
+.coin-suggest {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.coin-suggest__label {
+  flex-shrink: 0;
+  font-family: var(--coin-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.35;
+}
+
+.coin-suggest__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.coin-suggest__chip {
+  padding: 5px 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 9999px;
+  background: #fafafa;
+  color: #555;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-suggest__chip:hover {
+  border-color: #000;
+  color: #000;
+}
+
+/* Light colour per preset chip, matching its khata wash. */
+.coin-suggest__chip--mint { background: #e0f2f1; border-color: #bfe6e1; color: #0f5e58; }
+.coin-suggest__chip--yellow { background: #fffde7; border-color: #f2e9b8; color: #8a6d00; }
+.coin-suggest__chip--blue { background: #e3f2fd; border-color: #c3e0f5; color: #14568c; }
+.coin-suggest__chip--rose { background: #fff1f2; border-color: #f7d9df; color: #9f1239; }
+
+.coin-suggest__chip.is-active {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+
+.coin-muted {
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  opacity: 0.35;
 }
 
 .coin-entry-input {
@@ -297,6 +468,144 @@ a:hover {
   color: #eee;
 }
 
+.coin-entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.coin-entry-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #000;
+  opacity: 0.5;
+}
+
+.coin-entry-date input {
+  padding: 4px 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  background: #fcfcfc;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: #000;
+  opacity: 1;
+  cursor: pointer;
+}
+
+.coin-entry-date input:focus {
+  outline: none;
+  border-color: #000;
+  background: #fff;
+}
+
+.coin-entry-hint {
+  font-size: 12px;
+  opacity: 0.4;
+}
+
+/* Light-coloured card that wraps the one-line entry box. */
+.coin-entry-card {
+  padding: 22px 22px 16px;
+  border: 1px solid var(--coin-border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--coin-mint-soft) 0%, var(--coin-primary-soft) 100%);
+}
+
+/* ------------------------------------------------------------ log rows */
+
+.coin-log {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 10px;
+  border-bottom: 1px solid #f2f2f2;
+  font-family: var(--coin-font-mono);
+}
+
+.coin-log:hover {
+  background: #fafafa;
+}
+
+.coin-log__main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.coin-log__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.coin-khata__body .coin-log {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.coin-khata__body .coin-log:last-child {
+  border-bottom: none;
+}
+
+.coin-log__note {
+  font-size: 14px;
+  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coin-log__meta {
+  font-size: 11px;
+  opacity: 0.45;
+}
+
+.coin-log__amount {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.coin-log__delete {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid #e8e8e8;
+  border-radius: 9999px;
+  background: #fff;
+  color: #bbb;
+  font-family: var(--coin-font-mono);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-log__delete:hover:not(:disabled) {
+  border-color: #000;
+  background: #000;
+  color: #fff;
+}
+
+.coin-log__delete:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 .coin-pill--mint { background: #e0f2f1; color: #000; }
 .coin-pill--yellow { background: #fffde7; color: #000; }
 .coin-pill--blue { background: #e3f2fd; color: #000; }
@@ -311,6 +620,12 @@ a:hover {
   border-color: var(--coin-amber-ink);
   background: var(--coin-amber-soft);
   color: var(--coin-amber-ink);
+}
+
+.coin-btn--mint {
+  border-color: var(--coin-mint-ink);
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
 }
 
 .coin-btn--ghost {
@@ -451,9 +766,19 @@ a:hover {
   box-shadow: 0 8px 24px rgba(0,0,0,0.04);
 }
 
-.coin-tile:nth-child(3n + 1) { border-top: 4px solid #e0f2f1; }
-.coin-tile:nth-child(3n + 2) { border-top: 4px solid #fffde7; }
-.coin-tile:nth-child(3n + 3) { border-top: 4px solid #e3f2fd; }
+.coin-tile--ink { border-color: #14161a; border-top: 4px solid #14161a; background: #14161a; }
+.coin-tile--mint { border-color: #cdeee3; border-top: 4px solid #0d9488; background: #ecfdf5; }
+.coin-tile--blue { border-color: #d3e4fb; border-top: 4px solid #2563eb; background: #eff6ff; }
+
+.coin-tile--ink .coin-tile__label { color: rgba(255, 255, 255, 0.55); }
+.coin-tile--ink .coin-tile__value { color: #fff; }
+.coin-tile--ink .coin-tile__note { color: rgba(255, 255, 255, 0.6); }
+
+.coin-tile--ink:hover,
+.coin-tile--mint:hover,
+.coin-tile--blue:hover {
+  border-color: #000;
+}
 
 .coin-tile__label {
   font-family: var(--coin-font-mono);
@@ -493,6 +818,87 @@ a:hover {
   text-align: center;
   font-size: 13px;
   color: var(--coin-text-muted);
+}
+
+/* --------------------------------------------------------------- history */
+
+/* Big black call-to-action that opens the full history page. */
+.coin-history-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin-top: 32px;
+  padding: 20px 24px;
+  border: 1px solid #000;
+  border-radius: 16px;
+  background: #000;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.coin-history-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+}
+
+.coin-history-btn__text {
+  display: grid;
+  gap: 2px;
+}
+
+.coin-history-btn__title {
+  font-size: 22px;
+  font-weight: 900;
+  text-transform: lowercase;
+  letter-spacing: -0.02em;
+}
+
+.coin-history-btn__sub {
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.coin-history-btn__arrow {
+  font-size: 22px;
+  transition: transform 0.2s ease;
+}
+
+.coin-history-btn:hover .coin-history-btn__arrow {
+  transform: translateX(4px);
+}
+
+/* Search field + clear button on the history page. */
+.coin-history-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coin-history-bar .coin-search-bar {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.coin-history-bar__clear {
+  flex-shrink: 0;
+  padding: 9px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #555;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.coin-history-bar__clear:hover {
+  border-color: #000;
+  color: #000;
 }
 
 /* ----------------------------------------------------------- responsive */

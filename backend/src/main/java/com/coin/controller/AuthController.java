@@ -42,6 +42,13 @@ public class AuthController {
         return authService.login(request);
     }
 
+    /** Creates a throwaway account and returns a token for guest browsing. */
+    @PostMapping("/guest")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthResponse guest() {
+        return authService.guest();
+    }
+
     /** Requires a valid bearer token; used by the frontend to restore a session. */
     @GetMapping("/me")
     public UserResponse me(Authentication authentication) {
