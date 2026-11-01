@@ -59,7 +59,7 @@
   padding: 5px;
   border: 1px solid var(--coin-border);
   border-radius: 9999px;
-  background: #fafafa;
+  background: var(--coin-chip-bg);
 }
 
 .coin-history-sort__btn {
@@ -67,7 +67,7 @@
   border: none;
   border-radius: 9999px;
   background: transparent;
-  color: #666;
+  color: var(--coin-control-text);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   font-weight: 600;
@@ -77,12 +77,12 @@
 }
 
 .coin-history-sort__btn:hover {
-  color: #000;
+  color: var(--coin-ink);
 }
 
 .coin-history-sort__btn.is-active {
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 .coin-history-sort__btn:focus-visible {
@@ -132,10 +132,10 @@
 .coin-history-empty__action {
   margin-top: 8px;
   padding: 8px 18px;
-  border: 1px solid #000;
+  border: 1px solid var(--coin-ink);
   border-radius: 9999px;
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   font-weight: 600;
@@ -145,7 +145,7 @@
 
 .coin-history-empty__action:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--coin-shadow-empty);
 }
 
 .coin-history-empty--loading .coin-history-empty__glyph {
@@ -171,7 +171,7 @@
 
 .coin-history-page .coin-khata__body {
   padding: 0 14px 14px;
-  border-top: 1px solid rgba(20, 22, 26, 0.06);
+  border-top: 1px solid var(--coin-row-line);
 }
 
 .coin-history-page .coin-khata__add {
@@ -184,58 +184,58 @@
   gap: 14px;
   margin-top: 8px;
   padding: 11px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--coin-overlay-line);
+  border-bottom: 1px solid var(--coin-overlay-line);
   border-radius: var(--coin-radius);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--coin-overlay-soft);
   box-shadow: inset 3px 0 0 0 var(--coin-border-strong);
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .coin-history-page .coin-khata .coin-log:hover {
-  background: #fff;
+  background: var(--coin-surface);
 }
 
 /* Reinforce each khata's own pastel wash with a matching left accent. */
 .coin-history-page .coin-khata--mint .coin-log {
-  border-color: #d6efe9;
-  box-shadow: inset 3px 0 0 0 #0d9488;
+  border-color: var(--coin-mint-card-line);
+  box-shadow: inset 3px 0 0 0 var(--coin-mint);
 }
 
 .coin-history-page .coin-khata--yellow .coin-log {
-  border-color: #f3ebc9;
-  box-shadow: inset 3px 0 0 0 #d97706;
+  border-color: var(--coin-amber-card-line);
+  box-shadow: inset 3px 0 0 0 var(--coin-amber);
 }
 
 .coin-history-page .coin-khata--blue .coin-log {
-  border-color: #d6e6f7;
-  box-shadow: inset 3px 0 0 0 #2563eb;
+  border-color: var(--coin-blue-card-line);
+  box-shadow: inset 3px 0 0 0 var(--coin-blue);
 }
 
 .coin-history-page .coin-khata--rose .coin-log {
-  border-color: #f7d9df;
-  box-shadow: inset 3px 0 0 0 #e11d48;
+  border-color: var(--coin-rose-card-line);
+  box-shadow: inset 3px 0 0 0 var(--coin-rose);
 }
 
 /* Keep the card border on the final row (global.css removes it). */
 .coin-history-page .coin-khata__body .coin-log:last-child {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid var(--coin-overlay-line);
 }
 
 .coin-history-page .coin-khata--mint .coin-log:last-child {
-  border-bottom-color: #d6efe9;
+  border-bottom-color: var(--coin-mint-card-line);
 }
 
 .coin-history-page .coin-khata--yellow .coin-log:last-child {
-  border-bottom-color: #f3ebc9;
+  border-bottom-color: var(--coin-amber-card-line);
 }
 
 .coin-history-page .coin-khata--blue .coin-log:last-child {
-  border-bottom-color: #d6e6f7;
+  border-bottom-color: var(--coin-blue-card-line);
 }
 
 .coin-history-page .coin-khata--rose .coin-log:last-child {
-  border-bottom-color: #f7d9df;
+  border-bottom-color: var(--coin-rose-card-line);
 }
 
 /* Note truncates gracefully; the right block keeps its fixed column. */

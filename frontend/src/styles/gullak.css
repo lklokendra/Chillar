@@ -32,7 +32,7 @@
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1.05;
-  color: #000;
+  color: var(--coin-ink);
 }
 
 .coin-gullak-hero__note {
@@ -112,8 +112,8 @@
 
 .coin-gullak-action--in:hover:not(:disabled) {
   background: var(--coin-mint);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.22);
+  color: var(--coin-on-ink);
+  box-shadow: var(--coin-shadow-glow-mint);
 }
 
 .coin-gullak-action--out {
@@ -124,8 +124,8 @@
 
 .coin-gullak-action--out:hover:not(:disabled) {
   background: var(--coin-rose);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.22);
+  color: var(--coin-on-ink);
+  box-shadow: var(--coin-shadow-glow-rose);
 }
 
 /* Recent activity ---------------------------------------------------- */
@@ -195,7 +195,7 @@
 .coin-gullak-recent__note {
   font-family: var(--coin-font-mono);
   font-size: 14px;
-  color: #000;
+  color: var(--coin-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -245,7 +245,7 @@
 }
 
 .coin-gullak-back:hover {
-  color: #000;
+  color: var(--coin-ink);
   text-decoration: none;
 }
 
@@ -266,7 +266,7 @@
   padding: 5px;
   border: 1px solid var(--coin-border);
   border-radius: 9999px;
-  background: #fafafa;
+  background: var(--coin-chip-bg);
 }
 
 .coin-gullak-filters__btn {
@@ -274,7 +274,7 @@
   border: none;
   border-radius: 9999px;
   background: transparent;
-  color: #666;
+  color: var(--coin-control-text);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   font-weight: 600;
@@ -283,12 +283,12 @@
 }
 
 .coin-gullak-filters__btn:hover {
-  color: #000;
+  color: var(--coin-ink);
 }
 
 .coin-gullak-filters__btn.is-active {
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 /* Transaction list --------------------------------------------------- */
@@ -356,7 +356,7 @@
 .coin-gullak-row__note {
   font-family: var(--coin-font-mono);
   font-size: 14px;
-  color: #000;
+  color: var(--coin-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -406,7 +406,7 @@
   padding: 5px;
   border: 1px solid var(--coin-border);
   border-radius: 9999px;
-  background: #fafafa;
+  background: var(--coin-chip-bg);
 }
 
 .coin-gullak-toggle__btn {
@@ -414,7 +414,7 @@
   border: 1px solid transparent;
   border-radius: 9999px;
   background: transparent;
-  color: #666;
+  color: var(--coin-control-text);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   font-weight: 600;
@@ -423,7 +423,7 @@
 }
 
 .coin-gullak-toggle__btn:hover {
-  color: #000;
+  color: var(--coin-ink);
 }
 
 .coin-gullak-toggle__btn.is-active.coin-gullak-toggle__btn--deposit {
@@ -443,7 +443,7 @@
   display: grid;
   gap: 14px;
   padding: 16px;
-  border: 1px solid #000;
+  border: 1px solid var(--coin-ink);
   border-radius: var(--coin-radius);
   background: var(--coin-surface-soft);
 }
@@ -467,7 +467,7 @@
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #000;
+  color: var(--coin-ink);
   opacity: 0.5;
   margin-bottom: 6px;
   display: block;
@@ -476,10 +476,10 @@
 .coin-gullak-input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--coin-field-border);
   border-radius: 8px;
-  background: #fcfcfc;
-  color: #000;
+  background: var(--coin-field-bg);
+  color: var(--coin-ink);
   font-family: var(--coin-font-mono);
   font-size: 14px;
   transition: all 0.2s ease;
@@ -487,12 +487,1077 @@
 
 .coin-gullak-input:focus {
   outline: none;
-  border-color: #000;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: var(--coin-ink);
+  background: var(--coin-field-bg-focus);
+  box-shadow: var(--coin-shadow-field);
+}
+
+/* Category-wise savings ---------------------------------------------- */
+
+/* "goes into #laptop" line that appears under the entry box while typing. */
+.coin-gullak-filed {
+  margin-top: 12px;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-soft);
+}
+
+.coin-gullak-filed strong {
+  color: var(--coin-ink);
+}
+
+/* The goal name printed inside a ledger row's meta line. */
+.coin-gullak-row__goal {
+  color: var(--coin-text-soft);
+  font-weight: 600;
+}
+
+/* Goal cards --------------------------------------------------------- */
+
+.coin-gullak-goals {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+
+/* Each goal is a button: the whole card opens its dashboard. */
+.coin-gullak-goal {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 18px;
+  border: 1px solid var(--coin-border);
+  border-top: 4px solid var(--coin-border-strong);
+  border-radius: var(--coin-radius-lg);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow-sm);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.coin-gullak-goal:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--coin-shadow);
+}
+
+.coin-gullak-goal:focus-visible {
+  outline: none;
+  box-shadow: var(--coin-ring);
+}
+
+/* A goal with no target and no money is muted so real progress stands out. */
+.coin-gullak-goal.is-archived {
+  opacity: 0.65;
+}
+
+.coin-gullak-goal__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.coin-gullak-goal__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--coin-border);
+  border-radius: 10px;
+  background: var(--coin-surface);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.coin-gullak-goal__name {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coin-gullak-goal__badge {
+  flex: none;
+  margin-left: auto;
+  padding: 3px 9px;
+  border: 1px solid var(--coin-border-strong);
+  border-radius: 9999px;
+  background: var(--coin-surface-soft);
+  font-family: var(--coin-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-gullak-goal__badge.is-completed {
+  border-color: var(--coin-mint);
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-goal__badge.is-active {
+  color: var(--coin-text-soft);
+}
+
+.coin-gullak-goal__figures {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.coin-gullak-goal__saved {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--coin-ink);
+}
+
+.coin-gullak-goal__target {
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-soft);
+}
+
+.coin-gullak-goal__bar {
+  display: block;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--coin-border);
+  overflow: hidden;
+}
+
+.coin-gullak-goal__fill {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--coin-border-strong);
+  transition: width 0.3s ease;
+}
+
+.coin-gullak-goal__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-text-muted);
+}
+
+/* Per-goal accents: the top edge and the progress bar share one hue, and the
+   card gets a soft wash so a wall of goals stays easy to scan. */
+.coin-gullak-goal--mint {
+  border-top-color: var(--coin-mint);
+  background: linear-gradient(180deg, var(--coin-mint-soft) 0%, var(--coin-surface) 72%);
+}
+
+.coin-gullak-goal--mint .coin-gullak-goal__fill {
+  background: var(--coin-mint);
+}
+
+.coin-gullak-goal--amber {
+  border-top-color: var(--coin-amber);
+  background: linear-gradient(180deg, var(--coin-amber-soft) 0%, var(--coin-surface) 72%);
+}
+
+.coin-gullak-goal--amber .coin-gullak-goal__fill {
+  background: var(--coin-amber);
+}
+
+.coin-gullak-goal--indigo {
+  border-top-color: var(--coin-primary);
+  background: linear-gradient(180deg, var(--coin-primary-soft) 0%, var(--coin-surface) 72%);
+}
+
+.coin-gullak-goal--indigo .coin-gullak-goal__fill {
+  background: var(--coin-primary);
+}
+
+.coin-gullak-goal--rose {
+  border-top-color: var(--coin-rose);
+  background: linear-gradient(180deg, var(--coin-rose-soft) 0%, var(--coin-surface) 72%);
+}
+
+.coin-gullak-goal--rose .coin-gullak-goal__fill {
+  background: var(--coin-rose);
+}
+
+/* General savings ---------------------------------------------------- */
+
+.coin-gullak-general {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--coin-border);
+  border-left: 4px solid var(--coin-border-strong);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface-soft);
+}
+
+.coin-gullak-general__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--coin-border);
+  border-radius: 10px;
+  background: var(--coin-surface);
+  font-size: 17px;
+  line-height: 1;
+}
+
+.coin-gullak-general__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.coin-gullak-general__title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.coin-gullak-general__hint {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-text-muted);
+}
+
+.coin-gullak-general__amount {
+  margin-left: auto;
+  font-family: var(--coin-font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.coin-gullak-footnote {
+  margin-top: 18px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-text-muted);
+}
+
+.coin-gullak-footnote a {
+  color: var(--coin-text-soft);
+}
+
+/* Goal filter on the history page */
+.coin-gullak-goalfilter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.coin-gullak-goalfilter > span {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-gullak-goalfilter .coin-gullak-input {
+  max-width: 260px;
+  padding: 9px 14px;
+}
+
+/* The history card is sometimes a router Link rather than a button. */
+.coin-history-btn--link {
+  text-decoration: none;
+  color: var(--coin-on-ink);
+}
+
+/* Individual goal dashboard ------------------------------------------ */
+
+.coin-goalpage-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--coin-border);
+  border-top: 4px solid var(--coin-border-strong);
+  border-radius: var(--coin-radius-lg);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow-sm);
+}
+
+.coin-goalpage-head--mint {
+  border-top-color: var(--coin-mint);
+  background: linear-gradient(180deg, var(--coin-mint-soft) 0%, var(--coin-surface) 66%);
+}
+
+.coin-goalpage-head--amber {
+  border-top-color: var(--coin-amber);
+  background: linear-gradient(180deg, var(--coin-amber-soft) 0%, var(--coin-surface) 66%);
+}
+
+.coin-goalpage-head--indigo {
+  border-top-color: var(--coin-primary);
+  background: linear-gradient(180deg, var(--coin-primary-soft) 0%, var(--coin-surface) 66%);
+}
+
+.coin-goalpage-head--rose {
+  border-top-color: var(--coin-rose);
+  background: linear-gradient(180deg, var(--coin-rose-soft) 0%, var(--coin-surface) 66%);
+}
+
+.coin-goalpage-head__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--coin-border);
+  border-radius: 16px;
+  background: var(--coin-surface);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.coin-goalpage-head__body {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.coin-goalpage-head__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.coin-goalpage-head__name {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.coin-goalpage-head__desc {
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-soft);
+}
+
+.coin-goalpage-head__meta {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coin-text-muted);
+}
+
+.coin-goalpage-head__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: none;
+}
+
+/* Exactly three cards: target, saved, percentage. */
+.coin-goal-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.coin-goal-stat {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 18px 20px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius-lg);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow-sm);
+}
+
+.coin-goal-stat__label {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--coin-text-soft);
+  opacity: 0.75;
+}
+
+.coin-goal-stat__value {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--coin-text);
+}
+
+.coin-goal-stat__note {
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-soft);
+}
+
+.coin-goal-stat--target {
+  border-color: var(--coin-primary-soft);
+  border-top: 4px solid var(--coin-primary);
+  background: var(--coin-primary-soft);
+}
+
+.coin-goal-stat--saved {
+  border-color: var(--coin-amber-soft);
+  border-top: 4px solid var(--coin-amber);
+  background: var(--coin-amber-soft);
+}
+
+.coin-goal-stat--free {
+  border-color: var(--coin-mint-soft);
+  border-top: 4px solid var(--coin-mint);
+  background: var(--coin-mint-soft);
+}
+
+/* Days-remaining strip: the tone tells the story without a chart. */
+.coin-goalpage-days {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 16px 20px;
+  border: 1px solid var(--coin-border);
+  border-left: 4px solid var(--coin-border-strong);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface-soft);
+}
+
+.coin-goalpage-days__label {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-goalpage-days__value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.coin-goalpage-days__note {
+  margin-left: auto;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-text-muted);
+}
+
+.coin-goalpage-days.is-ok,
+.coin-goalpage-days.is-done {
+  border-left-color: var(--coin-mint);
+  background: var(--coin-mint-soft);
+}
+
+.coin-goalpage-days.is-today {
+  border-left-color: var(--coin-amber);
+  background: var(--coin-amber-soft);
+}
+
+.coin-goalpage-days.is-over {
+  border-left-color: var(--coin-rose);
+  background: var(--coin-rose-soft);
+}
+
+.coin-goalpage-bar {
+  height: 12px;
+  margin-top: 14px;
+  border-radius: 9999px;
+  background: var(--coin-border);
+  overflow: hidden;
+}
+
+.coin-goalpage-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, var(--coin-primary), var(--coin-mint));
+  transition: width 0.3s ease;
+}
+
+.coin-goalpage-bar__legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-text-muted);
+}
+
+.coin-goalpage-inline {
+  color: var(--coin-primary-ink);
+}
+
+/* Goal form (shown inside the modal) --------------------------------- */
+
+.coin-goal-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+/* Each block — details, target, appearance — keeps its own light wash so the
+   form reads as three short steps instead of one long list. */
+.coin-goal-form__group {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface-soft);
+}
+
+.coin-goal-form__group-title {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-goal-form__optional {
+  margin-left: 6px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--coin-text-muted);
+}
+
+.coin-goal-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.coin-goal-form__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.coin-goal-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.coin-goal-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--coin-border);
+  border-radius: 9px;
+  background: var(--coin-surface);
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.coin-goal-icon:hover:not(:disabled) {
+  border-color: var(--coin-ink);
+  transform: translateY(-1px);
+}
+
+.coin-goal-icon.is-active {
+  border-color: var(--coin-ink);
+  background: var(--coin-ink);
+}
+
+/* The "+" tile that reveals the free-text emoji field. */
+.coin-goal-icon--custom {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--coin-text-soft);
+}
+
+.coin-goal-icon--custom.is-active {
+  color: var(--coin-on-ink);
+}
+
+/* Free-text emoji field, kept compact so it sits under the suggestions. */
+.coin-goal-icon__input {
+  margin-top: 8px;
+  max-width: 220px;
+}
+
+.coin-goal-swatch {
+  width: 34px;
+  height: 34px;
+  border: 2px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.coin-goal-swatch:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.coin-goal-swatch.is-active {
+  box-shadow: inset 0 0 0 2px var(--coin-ink);
+}
+
+.coin-goal-swatch--mint {
+  background: var(--coin-mint-soft);
+  border-color: var(--coin-mint);
+}
+
+.coin-goal-swatch--amber {
+  background: var(--coin-amber-soft);
+  border-color: var(--coin-amber);
+}
+
+.coin-goal-swatch--indigo {
+  background: var(--coin-primary-soft);
+  border-color: var(--coin-primary);
+}
+
+.coin-goal-swatch--rose {
+  background: var(--coin-rose-soft);
+  border-color: var(--coin-rose);
+}
+
+/* Section "add" buttons ---------------------------------------------- */
+
+/* Right-hand side of a section heading: the tally plus its add button. */
+.coin-section__tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Compact pill used for every section-level add action. */
+.coin-add-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--coin-ink);
+  border-radius: 9999px;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.coin-add-chip > span[aria-hidden] {
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.coin-add-chip:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--coin-shadow-lift);
+}
+
+/* Quieter variant for the secondary sections (general savings, activity). */
+.coin-add-chip--soft {
+  border-color: var(--coin-border-strong);
+  background: var(--coin-surface);
+  color: var(--coin-ink);
+}
+
+.coin-add-chip--soft:hover:not(:disabled) {
+  border-color: var(--coin-ink);
+  background: var(--coin-surface-soft);
+  box-shadow: none;
+}
+
+/* Goal dialog -------------------------------------------------------- */
+
+.coin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.coin-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--coin-scrim);
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+
+.coin-modal__panel {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 22px 24px 20px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius-lg);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow-modal);
+  animation: coin-modal-in 0.16s ease;
+}
+
+@keyframes coin-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.coin-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.coin-modal__title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.coin-modal__sub {
+  margin-top: 4px;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-muted);
+}
+
+.coin-modal__close {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--coin-border);
+  border-radius: 9999px;
+  background: var(--coin-surface);
+  color: var(--coin-text-soft);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-modal__close:hover:not(:disabled) {
+  border-color: var(--coin-ink);
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
+}
+
+@media (max-width: 560px) {
+  .coin-modal {
+    padding: 12px;
+  }
+
+  .coin-modal__panel {
+    max-height: calc(100dvh - 24px);
+    padding: 18px 16px 16px;
+  }
+}
+
+/* Split withdrawal dialog ------------------------------------------- */
+
+/* Three headline figures: what was asked for, what the jar holds, what is
+   still unallocated. */
+.coin-split__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.coin-split__stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface-soft);
+}
+
+/* The "remaining" card lights up while money is still unassigned. */
+.coin-split__stat.is-due {
+  border-color: var(--coin-amber);
+  background: var(--coin-amber-soft);
+}
+
+.coin-split__stat-label {
+  font-family: var(--coin-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-split__stat-value {
+  font-family: var(--coin-font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--coin-text);
+}
+
+/* One row per savings category taking part in the withdrawal. */
+.coin-split__rows {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.coin-split__row {
+  display: grid;
+  gap: 6px;
+}
+
+.coin-split__row-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 32px;
+  align-items: center;
+  gap: 8px;
+}
+
+.coin-split__select,
+.coin-split__amount {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.coin-split__remove {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--coin-border);
+  border-radius: 9999px;
+  background: var(--coin-surface);
+  color: var(--coin-text-soft);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-split__remove:hover:not(:disabled) {
+  border-color: var(--coin-rose);
+  background: var(--coin-rose-soft);
+  color: var(--coin-rose-ink);
+}
+
+.coin-split__remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.coin-split__row-error {
+  margin: 0;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-rose-ink);
+}
+
+.coin-split__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border: 1px dashed var(--coin-border-strong);
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--coin-text-soft);
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-split__add:hover:not(:disabled) {
+  border-color: var(--coin-text);
+  color: var(--coin-text);
+}
+
+.coin-split__add:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.coin-split__hint {
+  margin: 8px 0 0;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-text-muted);
+}
+
+.coin-split__totals {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--coin-border);
+}
+
+.coin-split__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: var(--coin-font-mono);
+  font-size: 13px;
+  color: var(--coin-text-soft);
+}
+
+.coin-split__total strong {
+  font-size: 15px;
+  color: var(--coin-text);
+}
+
+.coin-split__status {
+  margin: 4px 0 0;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+}
+
+.coin-split__status.is-ok {
+  color: var(--coin-mint-ink);
+}
+
+.coin-split__status.is-warn {
+  color: var(--coin-amber-ink);
+}
+
+.coin-split__status.is-bad {
+  color: var(--coin-rose-ink);
+}
+
+.coin-split__status.is-idle {
+  color: var(--coin-text-muted);
+}
+
+/* A split withdrawal as it appears in the ledger: a tag plus the per-category
+   breakdown, so the one entry the user made stays one entry here. */
+.coin-gullak-row__tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border: 1px solid var(--coin-border-strong);
+  border-radius: 9999px;
+  background: var(--coin-surface-soft);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--coin-text-soft);
+}
+
+.coin-gullak-row__allocations {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.coin-gullak-row__allocations li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 340px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  color: var(--coin-text-soft);
 }
 
 /* Responsive --------------------------------------------------------- */
+
+@media (max-width: 560px) {
+  .coin-split__summary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coin-split__row-line {
+    grid-template-columns: minmax(0, 1fr) 32px;
+  }
+
+  .coin-split__row-line .coin-split__select {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .coin-goal-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coin-goalpage-head {
+    flex-wrap: wrap;
+  }
+
+  .coin-goalpage-head__actions {
+    flex-direction: row;
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .coin-goalpage-head__name {
+    font-size: 24px;
+  }
+
+  .coin-goalpage-head__actions {
+    flex-wrap: wrap;
+  }
+
+  .coin-goal-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coin-goal-form__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coin-goalpage-days__note {
+    margin-left: 0;
+  }
+}
 
 @media (max-width: 560px) {
   .coin-gullak-hero__value {

@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Chillar - a minimal personal finance tracker" />
     <title>Chillar | Finance Tracker</title>
+    <script>
+      // Applies the saved theme before the first paint, so a returning dark-mode
+      // visitor never sees a white flash. Mirrors resolveTheme() in ThemeContext.
+      (function () {
+        try {
+          var stored = window.localStorage.getItem('chillar.theme')
+          var dark =
+            stored === 'dark' ||
+            (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+          var theme = dark ? 'dark' : 'light'
+          document.documentElement.dataset.theme = theme
+          document.documentElement.style.colorScheme = theme
+        } catch (error) {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

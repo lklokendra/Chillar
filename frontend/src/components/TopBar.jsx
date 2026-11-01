@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import Brand from './Brand'
 import Button from './Button'
+import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
 
 const SECTIONS = [
@@ -31,9 +32,12 @@ export default function TopBar() {
         ))}
       </nav>
 
-      <Button variant="ghost" size="sm" onClick={signOut} className="coin-appbar__signout">
-        Sign out
-      </Button>
+      <div className="coin-appbar__side">
+        <ThemeToggle />
+        <Button variant="ghost" size="sm" onClick={signOut} className="coin-appbar__signout">
+          Sign out
+        </Button>
+      </div>
     </header>
   )
 }

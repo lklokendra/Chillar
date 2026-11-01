@@ -9,6 +9,15 @@ import '../styles/split.css'
 
 const blankExpense = () => ({ title: '', amount: '', participantId: '', date: todayIso() })
 
+/** A settlement record starts with no payer/receiver chosen. */
+const blankSettlement = () => ({ payerId: '', receiverId: '', amount: '', date: todayIso(), note: '' })
+
+/** An empty amount means "pay the whole remaining balance" (mark as paid). */
+const blankPayment = () => ({ amount: '', paidAt: todayIso(), note: '' })
+
+/** Green when completed, amber when part-paid, rose when nothing has moved yet. */
+const STATUS_LABEL = { PENDING: 'pending', PARTIALLY_PAID: 'part paid', PAID: 'paid' }
+
 function money(value) {
   return `₹${Number(value ?? 0).toLocaleString(undefined, {
     minimumFractionDigits: 0,
@@ -63,6 +72,19 @@ export default function SplitGroupPage() {
   const [savingExpense, setSavingExpense] = useState(false)
   const [deletingExpenseId, setDeletingExpenseId] = useState(null)
 
+  // Settlement tracking: real records, their instalments and the audit trail.
+  const [settlementForm, setSettlementForm] = useState(blankSettlement)
+  const [addingSettlement, setAddingSettlement] = useState(false)
+  const [payingId, setPayingId] = useState(null)
+  const [paymentForm, setPaymentForm] = useState(blankPayment)
+  const [recordingPayment, setRecordingPayment] = useState(false)
+  const [markingId, setMarkingId] = useState(null)
+  const [deletingSettlementId, setDeletingSettlementId] = useState(null)
+  const [removingPaymentId, setRemovingPaymentId] = useState(null)
+  const [reconciling, setReconciling] = useState(false)
+  const [historyPerson, setHistoryPerson] = useState('all')
+  const [historySort, setHistorySort] = useState('date_desc')
+
   const load = useCallback(async () => {
     setLoading(true)
     try {
@@ -82,6 +104,23 @@ export default function SplitGroupPage() {
   const expenses = group?.expenses ?? []
   const summary = group?.summary ?? []
   const settlements = group?.settlements ?? []
+  const settlementRecords = group?.settlementRecords ?? []
+  const settlementDashboard = group?.settlementDashboard ?? null
+  const settlementAudit = group?.settlementAudit ?? []
+
+  // Settlement history: filter by participant and order by date, entirely on
+  // the already-loaded records - no extra round trip.
+  const historyRecords = settlementRecords
+    .filter((record) => {
+      if (historyPerson === 'all') return true
+      const id = Number(historyPerson)
+      return record.payerId === id || record.receiverId === id
+    })
+    .slice()
+    .sort((a, b) => {
+      const diff = String(a.date).localeCompare(String(b.date))
+      return historySort === 'date_asc' ? diff : -diff
+    })
 
   // Keep the "paid by" select valid whenever the participant list changes.
   useEffect(() => {
@@ -231,6 +270,133 @@ export default function SplitGroupPage() {
     }
   }
 
+  // -------------------------------------------------------- settlement tracker
+
+  function startPayment(record) {
+    setPayingId(record.id)
+    setPaymentForm(blankPayment())
+  }
+
+  async function handleAddSettlement(event) {
+    event.preventDefault()
+    if (!settlementForm.payerId || !settlementForm.receiverId || !settlementForm.amount || addingSettlement) {
+      return
+    }
+
+    setAddingSettlement(true)
+    setError('')
+    setNotice('')
+    try {
+      await splitApi.recordSettlement(groupId, {
+        payerId: Number(settlementForm.payerId),
+        receiverId: Number(settlementForm.receiverId),
+        amount: Number(settlementForm.amount),
+        date: settlementForm.date || todayIso(),
+        note: settlementForm.note.trim() || null,
+      })
+      setSettlementForm(blankSettlement())
+      setNotice('Settlement logged as pending')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setAddingSettlement(false)
+    }
+  }
+
+  /** No amount typed means "pay the whole remaining balance". */
+  async function handleRecordPayment(event, record) {
+    event.preventDefault()
+    if (recordingPayment) return
+
+    const typed = paymentForm.amount.trim()
+    setRecordingPayment(true)
+    setError('')
+    setNotice('')
+    try {
+      await splitApi.recordPayment(groupId, record.id, {
+        amount: typed ? Number(typed) : undefined,
+        paidAt: paymentForm.paidAt || todayIso(),
+        note: paymentForm.note.trim() || null,
+      })
+      setPayingId(null)
+      setNotice(typed ? 'Payment recorded' : 'Marked as paid')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setRecordingPayment(false)
+    }
+  }
+
+  async function handleMarkPaid(record) {
+    setMarkingId(record.id)
+    setError('')
+    setNotice('')
+    try {
+      await splitApi.recordPayment(groupId, record.id, { paidAt: todayIso() })
+      setNotice('Marked as paid')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setMarkingId(null)
+    }
+  }
+
+  async function handleRemovePayment(record, payment) {
+    if (!window.confirm(`Remove the ${money(payment.amount)} payment made by ${record.payerName}?`)) return
+
+    setRemovingPaymentId(payment.id)
+    setError('')
+    setNotice('')
+    try {
+      await splitApi.removePayment(groupId, record.id, payment.id)
+      setNotice('Payment removed')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setRemovingPaymentId(null)
+    }
+  }
+
+  async function handleDeleteSettlement(record) {
+    const confirmed = window.confirm(
+      `Delete the ${money(record.amount)} settlement from ${record.payerName} to ${record.receiverName}? ` +
+        'The audit trail is kept.',
+    )
+    if (!confirmed) return
+
+    setDeletingSettlementId(record.id)
+    setError('')
+    setNotice('')
+    try {
+      await splitApi.deleteSettlement(groupId, record.id)
+      setNotice('Settlement record deleted')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setDeletingSettlementId(null)
+    }
+  }
+
+  async function handleReconcile() {
+    setReconciling(true)
+    setError('')
+    setNotice('')
+    try {
+      await splitApi.markReconciled(groupId)
+      setNotice('Marked as reconciled')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setReconciling(false)
+    }
+  }
+
   /** Shared "who paid" control for the add and edit expense forms. */
   function participantOptions() {
     return participants.map((person) => (
@@ -271,6 +437,30 @@ export default function SplitGroupPage() {
               {group.description && <p className="coin-page__subtitle">{group.description}</p>}
             </div>
           </div>
+
+          {/* Balances moved after settlements were logged - never auto-rewritten. */}
+          {group.needsReconciliation && (
+            <div className="coin-split-reconcile" role="status" style={{ marginTop: '16px' }}>
+              <div className="coin-split-reconcile__text">
+                <strong className="coin-split-reconcile__title">
+                  balances changed since these settlements were logged
+                </strong>
+                <span className="coin-split-reconcile__hint">
+                  Your settlement records were left untouched. Check them against the new balances and
+                  mark the group reconciled once they still line up.
+                </span>
+              </div>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={handleReconcile}
+                disabled={reconciling}
+              >
+                {reconciling ? 'saving…' : 'mark reconciled'}
+              </Button>
+            </div>
+          )}
 
           <div className="coin-split-stats">
             <div className="coin-split-stat-card coin-split-stat-card--total">
@@ -615,6 +805,352 @@ export default function SplitGroupPage() {
                   </div>
                 ))}
               </div>
+            )}
+          </section>
+
+          {/* Settlement tracking: real records, instalments and audit trail */}
+          <section className="coin-split-section">
+            <h2 className="coin-section__title">settlement tracker</h2>
+            <p className="coin-split-note">
+              Settlements you actually logged. The suggested transfers above are recalculated from the
+              expenses on every load and are never merged with these records.
+            </p>
+
+            {settlementDashboard && (
+              <div className="coin-split-settle-stats">
+                <div className="coin-split-settle-card coin-split-settle-card--owed">
+                  <span className="coin-split-stat-card__label">total owed</span>
+                  <span className="coin-split-settle-card__value">{money(settlementDashboard.totalOwed)}</span>
+                  <span className="coin-split-stat-card__note">
+                    {settlementDashboard.totalRecords}{' '}
+                    {settlementDashboard.totalRecords === 1 ? 'record' : 'records'}
+                  </span>
+                </div>
+                <div className="coin-split-settle-card coin-split-settle-card--received">
+                  <span className="coin-split-stat-card__label">received</span>
+                  <span className="coin-split-settle-card__value">
+                    {money(settlementDashboard.totalReceived)}
+                  </span>
+                  <span className="coin-split-stat-card__note">
+                    {settlementDashboard.completedCount} completed
+                  </span>
+                </div>
+                <div className="coin-split-settle-card coin-split-settle-card--pending">
+                  <span className="coin-split-stat-card__label">pending</span>
+                  <span className="coin-split-settle-card__value">
+                    {money(settlementDashboard.totalPending)}
+                  </span>
+                  <span className="coin-split-stat-card__note">
+                    {settlementDashboard.pendingCount} pending · {settlementDashboard.partialCount} part paid
+                  </span>
+                </div>
+                <div className="coin-split-settle-card coin-split-settle-card--suggested">
+                  <span className="coin-split-stat-card__label">still owed overall</span>
+                  <span className="coin-split-settle-card__value">
+                    {money(settlementDashboard.suggestedOutstanding)}
+                  </span>
+                  <span className="coin-split-stat-card__note">from current balances</span>
+                </div>
+              </div>
+            )}
+
+            {participants.length < 2 ? (
+              <div className="coin-empty" style={{ marginTop: '12px' }}>
+                Add at least two participants to track a settlement.
+              </div>
+            ) : (
+              <form className="coin-split-card coin-split-form" onSubmit={handleAddSettlement}>
+                <div className="coin-split-create__head">
+                  <span className="coin-split-create__title">log a settlement</span>
+                  <span className="coin-split-create__hint">
+                    Recorded as pending until you mark it paid or add part payments.
+                  </span>
+                </div>
+                <div className="coin-split-form__row">
+                  <select
+                    className="coin-split-select"
+                    value={settlementForm.payerId}
+                    onChange={(e) => setSettlementForm((form) => ({ ...form, payerId: e.target.value }))}
+                    disabled={addingSettlement}
+                  >
+                    <option value="">who pays…</option>
+                    {participantOptions()}
+                  </select>
+                  <select
+                    className="coin-split-select"
+                    value={settlementForm.receiverId}
+                    onChange={(e) => setSettlementForm((form) => ({ ...form, receiverId: e.target.value }))}
+                    disabled={addingSettlement}
+                  >
+                    <option value="">who receives…</option>
+                    {participantOptions()}
+                  </select>
+                  <input
+                    className="coin-split-input coin-split-input--amount"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="amount"
+                    value={settlementForm.amount}
+                    onChange={(e) => setSettlementForm((form) => ({ ...form, amount: e.target.value }))}
+                    disabled={addingSettlement}
+                  />
+                  <input
+                    className="coin-split-input coin-split-input--date"
+                    type="date"
+                    value={settlementForm.date}
+                    onChange={(e) => setSettlementForm((form) => ({ ...form, date: e.target.value }))}
+                    disabled={addingSettlement}
+                  />
+                  <input
+                    className="coin-split-input"
+                    placeholder="note (optional)"
+                    maxLength={255}
+                    value={settlementForm.note}
+                    onChange={(e) => setSettlementForm((form) => ({ ...form, note: e.target.value }))}
+                    disabled={addingSettlement}
+                  />
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    disabled={
+                      addingSettlement ||
+                      !settlementForm.payerId ||
+                      !settlementForm.receiverId ||
+                      !settlementForm.amount
+                    }
+                  >
+                    {addingSettlement ? 'saving…' : 'log settlement'}
+                  </Button>
+                </div>
+              </form>
+            )}
+
+            {/* Settlement history: filter + sort, with payment details inline. */}
+            {settlementRecords.length === 0 ? (
+              <div className="coin-empty" style={{ marginTop: '12px' }}>
+                No settlements logged yet.
+              </div>
+            ) : (
+              <>
+                <div className="coin-split-history-bar">
+                  <span className="coin-split-history-bar__label">history</span>
+                  <select
+                    className="coin-split-select coin-split-select--compact"
+                    value={historyPerson}
+                    onChange={(e) => setHistoryPerson(e.target.value)}
+                  >
+                    <option value="all">everyone</option>
+                    {participants.map((person) => (
+                      <option key={person.id} value={person.id}>
+                        {person.name}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className="coin-split-select coin-split-select--compact"
+                    value={historySort}
+                    onChange={(e) => setHistorySort(e.target.value)}
+                  >
+                    <option value="date_desc">newest first</option>
+                    <option value="date_asc">oldest first</option>
+                  </select>
+                </div>
+
+                {historyRecords.length === 0 ? (
+                  <div className="coin-empty" style={{ marginTop: '12px' }}>
+                    No settlements for that person.
+                  </div>
+                ) : (
+                  <div className="coin-split-records">
+                    {historyRecords.map((record) => {
+                      const statusClass = String(record.status).toLowerCase()
+                      const settled = record.status === 'PAID'
+                      return (
+                        <div
+                          className={`coin-split-record coin-split-record--${statusClass}`}
+                          key={record.id}
+                        >
+                          <div className="coin-split-record__head">
+                            <span className="coin-split-record__route">
+                              <span className="coin-split-settlement__route--payer">
+                                {record.payerName}
+                              </span>
+                              <span className="coin-split-settlement__arrow" aria-hidden="true">
+                                →
+                              </span>
+                              <span className="coin-split-settlement__route--payee">
+                                {record.receiverName}
+                              </span>
+                            </span>
+                            <span className={`coin-split-status coin-split-status--${statusClass}`}>
+                              {STATUS_LABEL[record.status] ?? record.status}
+                            </span>
+                          </div>
+
+                          <div className="coin-split-record__figures">
+                            <div className="coin-split-figure">
+                              <span className="coin-split-figure__label">original</span>
+                              <span className="coin-split-figure__value">{money(record.amount)}</span>
+                            </div>
+                            <div className="coin-split-figure">
+                              <span className="coin-split-figure__label">paid</span>
+                              <span className="coin-split-figure__value">{money(record.paidAmount)}</span>
+                            </div>
+                            <div className="coin-split-figure">
+                              <span className="coin-split-figure__label">remaining</span>
+                              <span className="coin-split-figure__value">{money(record.remaining)}</span>
+                            </div>
+                            <div className="coin-split-figure">
+                              <span className="coin-split-figure__label">date</span>
+                              <span className="coin-split-figure__value">{formatDate(record.date)}</span>
+                            </div>
+                          </div>
+
+                          {record.note && <p className="coin-split-record__note">{record.note}</p>}
+
+                          {record.payments.length > 0 && (
+                            <ul className="coin-split-payments">
+                              {record.payments.map((payment) => (
+                                <li className="coin-split-payment" key={payment.id}>
+                                  <span className="coin-split-payment__amount">
+                                    {money(payment.amount)}
+                                  </span>
+                                  <span className="coin-split-payment__date">
+                                    {formatDate(payment.paidAt)}
+                                  </span>
+                                  {payment.note && (
+                                    <span className="coin-split-payment__note">{payment.note}</span>
+                                  )}
+                                  <button
+                                    type="button"
+                                    className="coin-split-person__btn"
+                                    title="Remove this payment"
+                                    onClick={() => handleRemovePayment(record, payment)}
+                                    disabled={removingPaymentId === payment.id}
+                                  >
+                                    ×
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+
+                          <div className="coin-split-record__actions">
+                            {!settled &&
+                              (payingId === record.id ? (
+                                <form
+                                  className="coin-split-form__row coin-split-pay-form"
+                                  onSubmit={(event) => handleRecordPayment(event, record)}
+                                >
+                                  <input
+                                    className="coin-split-input coin-split-input--amount"
+                                    type="number"
+                                    min="0.01"
+                                    step="0.01"
+                                    placeholder={`${record.remaining} (full)`}
+                                    value={paymentForm.amount}
+                                    onChange={(e) =>
+                                      setPaymentForm((form) => ({ ...form, amount: e.target.value }))
+                                    }
+                                    disabled={recordingPayment}
+                                  />
+                                  <input
+                                    className="coin-split-input coin-split-input--date"
+                                    type="date"
+                                    value={paymentForm.paidAt}
+                                    onChange={(e) =>
+                                      setPaymentForm((form) => ({ ...form, paidAt: e.target.value }))
+                                    }
+                                    disabled={recordingPayment}
+                                  />
+                                  <input
+                                    className="coin-split-input"
+                                    placeholder="note (optional)"
+                                    maxLength={255}
+                                    value={paymentForm.note}
+                                    onChange={(e) =>
+                                      setPaymentForm((form) => ({ ...form, note: e.target.value }))
+                                    }
+                                    disabled={recordingPayment}
+                                  />
+                                  <Button
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                    disabled={recordingPayment}
+                                  >
+                                    {recordingPayment ? 'saving…' : 'record payment'}
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setPayingId(null)}
+                                    disabled={recordingPayment}
+                                  >
+                                    cancel
+                                  </Button>
+                                </form>
+                              ) : (
+                                <>
+                                  <Button
+                                    type="button"
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() => handleMarkPaid(record)}
+                                    disabled={markingId === record.id}
+                                  >
+                                    {markingId === record.id ? 'saving…' : 'mark as paid'}
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => startPayment(record)}
+                                  >
+                                    part payment
+                                  </Button>
+                                </>
+                              ))}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteSettlement(record)}
+                              disabled={deletingSettlementId === record.id}
+                            >
+                              delete
+                            </Button>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {settlementAudit.length > 0 && (
+                  <details className="coin-split-audit">
+                    <summary className="coin-split-audit__summary">
+                      audit trail · {settlementAudit.length} entries
+                    </summary>
+                    <ul className="coin-split-audit__list">
+                      {settlementAudit.map((entry) => (
+                        <li className="coin-split-audit__item" key={entry.id}>
+                          <span className="coin-split-audit__action">
+                            {String(entry.action).toLowerCase().replace(/_/g, ' ')}
+                          </span>
+                          <span className="coin-split-audit__detail">{entry.detail}</span>
+                          <span className="coin-split-audit__time">
+                            {new Date(entry.createdAt).toLocaleString()}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </>
             )}
           </section>
         </>

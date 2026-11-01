@@ -3,7 +3,14 @@
  * One place to change the whole look: minimal white canvas, vibrant accents.
  * Every accent exposes three values: the hue, a soft background, and a dark ink
  * used for text + borders (that pair is what the small buttons are built from).
+ *
+ * Dark mode is not a second set of components: <html data-theme="dark"> simply
+ * re-points these same custom properties, so every rule below and in global.css,
+ * history.css, gullak.css and split.css follows automatically. `data-theme` is
+ * written by ThemeContext (and by the inline script in index.html, before first
+ * paint, so a returning dark-mode visitor never sees a white flash).
  */
+
 :root {
   color-scheme: light;
 
@@ -13,11 +20,37 @@
   --coin-surface-soft: #fbfbfc;
   --coin-border: #e8eaee;
   --coin-border-strong: #d5d9e0;
+  --coin-hairline: #f2f2f2;
+  --coin-row-line: rgba(20, 22, 26, 0.06);
+  --coin-overlay: rgba(255, 255, 255, 0.88);
+  --coin-overlay-soft: rgba(255, 255, 255, 0.72);
+  --coin-overlay-line: rgba(255, 255, 255, 0.9);
 
   /* Text */
   --coin-text: #14161a;
   --coin-text-soft: #4b5361;
   --coin-text-muted: #8a92a0;
+
+  /* Solid "ink": filled buttons, active pills, headline text */
+  --coin-ink: #000000;
+  --coin-on-ink: #ffffff;
+  --coin-ink-hover: #333333;
+
+  /* Form fields and compact controls */
+  --coin-field-bg: #fcfcfc;
+  --coin-field-bg-focus: #ffffff;
+  --coin-field-border: #e0e0e0;
+  --coin-chip-bg: #fafafa;
+  --coin-chip-border: #eeeeee;
+  --coin-control-text: #666666;
+  --coin-control-text-soft: #555555;
+
+  /* Ghost / tertiary chrome */
+  --coin-ghost-border: #e8e8e8;
+  --coin-ghost-text: #bbbbbb;
+  --coin-ghost-text-soft: #aaaaaa;
+  --coin-placeholder: #cccccc;
+  --coin-placeholder-soft: #eeeeee;
 
   /* Primary - indigo */
   --coin-primary: #4f46e5;
@@ -40,6 +73,38 @@
   --coin-rose-soft: #fff1f2;
   --coin-rose-ink: #9f1239;
 
+  /* Accent - blue (khata cards, tiles) */
+  --coin-blue: #2563eb;
+  --coin-blue-soft: #eff6ff;
+  --coin-blue-line: #d3e4fb;
+  --coin-blue-soft-2: #e3f2fd;
+  --coin-blue-line-2: #c3e0f5;
+  --coin-blue-ink: #14568c;
+
+  /* Khata washes: a roomy pastel card per badge colour */
+  --coin-mint-card: #f2fbf9;
+  --coin-mint-card-line: #d6efe9;
+  --coin-amber-card: #fffdf3;
+  --coin-amber-card-line: #f3ebc9;
+  --coin-blue-card: #f4f9ff;
+  --coin-blue-card-line: #d6e6f7;
+  --coin-rose-card: #fff6f7;
+  --coin-rose-card-line: #f7d9df;
+
+  /* Preset chips: a denser tint of the same washes */
+  --coin-mint-chip: #e0f2f1;
+  --coin-mint-chip-line: #bfe6e1;
+  --coin-mint-chip-ink: #0f5e58;
+  --coin-amber-chip: #fffde7;
+  --coin-amber-chip-line: #f2e9b8;
+  --coin-amber-chip-ink: #8a6d00;
+
+  /* The inverted "hero" tile (total balance) */
+  --coin-tile-ink-bg: #14161a;
+  --coin-tile-ink-text: #ffffff;
+  --coin-tile-ink-muted: rgba(255, 255, 255, 0.55);
+  --coin-tile-ink-muted-2: rgba(255, 255, 255, 0.6);
+
   /* Wash - faint colour blooms that sit on the white canvas */
   --coin-wash-indigo: rgba(79, 70, 229, 0.1);
   --coin-wash-mint: rgba(13, 148, 136, 0.1);
@@ -52,9 +117,172 @@
   --coin-radius-lg: 16px;
   --coin-shadow-sm: 0 1px 2px rgba(20, 22, 26, 0.05);
   --coin-shadow: 0 8px 24px rgba(20, 22, 26, 0.06);
+  --coin-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.04);
+  --coin-shadow-lift: 0 6px 16px rgba(0, 0, 0, 0.18);
+  --coin-shadow-cta: 0 10px 28px rgba(0, 0, 0, 0.18);
+  --coin-shadow-field: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --coin-shadow-empty: 0 6px 18px rgba(0, 0, 0, 0.16);
+  --coin-shadow-glow-mint: 0 6px 16px rgba(13, 148, 136, 0.22);
+  --coin-shadow-glow-rose: 0 6px 16px rgba(225, 29, 72, 0.22);
   --coin-ring: 0 0 0 3px rgba(79, 70, 229, 0.16);
+  --coin-scrim: rgba(20, 22, 26, 0.42);
+  --coin-shadow-modal: 0 24px 60px rgba(20, 22, 26, 0.22);
 
   /* Type */
   --coin-font: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   --coin-font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+/*
+ * Dark palette.
+ *
+ * Only the colour-bearing tokens change. Accent hues are lifted a step or two so
+ * they stay legible on a dark canvas, and every "soft" wash becomes a translucent
+ * tint of its own hue — the same relationship the light theme has, just inverted.
+ * Deposits stay green, withdrawals stay red, pending stays amber, completed green.
+ */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --coin-bg: #101114;
+  --coin-surface: #191b20;
+  --coin-surface-soft: #22252b;
+  --coin-border: #30343b;
+  --coin-border-strong: #3d424a;
+  --coin-hairline: #262a30;
+  --coin-row-line: rgba(255, 255, 255, 0.08);
+  --coin-overlay: rgba(25, 27, 32, 0.9);
+  --coin-overlay-soft: rgba(25, 27, 32, 0.55);
+  --coin-overlay-line: rgba(255, 255, 255, 0.06);
+
+  /* Text */
+  --coin-text: #f5f5f5;
+  --coin-text-soft: #a1a1aa;
+  --coin-text-muted: #8b929c;
+
+  /* Ink inverts: a "solid black" button becomes a light button on the dark canvas */
+  --coin-ink: #f5f5f5;
+  --coin-on-ink: #101114;
+  --coin-ink-hover: #dcdcdc;
+
+  /* Form fields and compact controls */
+  --coin-field-bg: #22252b;
+  --coin-field-bg-focus: #2b2f36;
+  --coin-field-border: #30343b;
+  --coin-chip-bg: #22252b;
+  --coin-chip-border: #30343b;
+  --coin-control-text: #a1a1aa;
+  --coin-control-text-soft: #8b929c;
+
+  /* Ghost / tertiary chrome */
+  --coin-ghost-border: #343941;
+  --coin-ghost-text: #6b7280;
+  --coin-ghost-text-soft: #6b7280;
+  --coin-placeholder: #4d545e;
+  --coin-placeholder-soft: #3a4049;
+
+  /* Primary - indigo */
+  --coin-primary: #7c74ff;
+  --coin-primary-soft: rgba(124, 116, 255, 0.16);
+  --coin-primary-soft-hover: rgba(124, 116, 255, 0.24);
+  --coin-primary-ink: #b8b3ff;
+
+  /* Accent - mint */
+  --coin-mint: #2dd4bf;
+  --coin-mint-soft: rgba(45, 212, 191, 0.14);
+  --coin-mint-ink: #5eead4;
+
+  /* Accent - amber */
+  --coin-amber: #fbbf24;
+  --coin-amber-soft: rgba(251, 191, 36, 0.14);
+  --coin-amber-ink: #fcd34d;
+
+  /* Accent - rose */
+  --coin-rose: #fb7185;
+  --coin-rose-soft: rgba(251, 113, 133, 0.14);
+  --coin-rose-ink: #fda4af;
+
+  /* Accent - blue */
+  --coin-blue: #60a5fa;
+  --coin-blue-soft: rgba(96, 165, 250, 0.14);
+  --coin-blue-line: rgba(96, 165, 250, 0.3);
+  --coin-blue-soft-2: rgba(96, 165, 250, 0.16);
+  --coin-blue-line-2: rgba(96, 165, 250, 0.32);
+  --coin-blue-ink: #93c5fd;
+
+  /* Khata washes */
+  --coin-mint-card: rgba(45, 212, 191, 0.08);
+  --coin-mint-card-line: rgba(45, 212, 191, 0.28);
+  --coin-amber-card: rgba(251, 191, 36, 0.08);
+  --coin-amber-card-line: rgba(251, 191, 36, 0.28);
+  --coin-blue-card: rgba(96, 165, 250, 0.08);
+  --coin-blue-card-line: rgba(96, 165, 250, 0.28);
+  --coin-rose-card: rgba(251, 113, 133, 0.08);
+  --coin-rose-card-line: rgba(251, 113, 133, 0.28);
+
+  /* Preset chips */
+  --coin-mint-chip: rgba(45, 212, 191, 0.16);
+  --coin-mint-chip-line: rgba(45, 212, 191, 0.32);
+  --coin-mint-chip-ink: #5eead4;
+  --coin-amber-chip: rgba(251, 191, 36, 0.16);
+  --coin-amber-chip-line: rgba(251, 191, 36, 0.32);
+  --coin-amber-chip-ink: #fcd34d;
+
+  /* The hero tile flips to a light card so it still leads the page */
+  --coin-tile-ink-bg: #f5f5f5;
+  --coin-tile-ink-text: #101114;
+  --coin-tile-ink-muted: rgba(16, 17, 20, 0.6);
+  --coin-tile-ink-muted-2: rgba(16, 17, 20, 0.65);
+
+  /* Wash */
+  --coin-wash-indigo: rgba(124, 116, 255, 0.16);
+  --coin-wash-mint: rgba(45, 212, 191, 0.16);
+  --coin-wash-amber: rgba(251, 191, 36, 0.16);
+
+  /* Depth is deeper on a dark canvas */
+  --coin-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --coin-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --coin-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --coin-shadow-lift: 0 6px 16px rgba(0, 0, 0, 0.6);
+  --coin-shadow-cta: 0 10px 28px rgba(0, 0, 0, 0.6);
+  --coin-shadow-field: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --coin-shadow-empty: 0 6px 18px rgba(0, 0, 0, 0.55);
+  --coin-shadow-glow-mint: 0 6px 16px rgba(45, 212, 191, 0.28);
+  --coin-shadow-glow-rose: 0 6px 16px rgba(251, 113, 133, 0.28);
+  --coin-ring: 0 0 0 3px rgba(124, 116, 255, 0.3);
+  --coin-scrim: rgba(0, 0, 0, 0.6);
+  --coin-shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+/*
+ * The canvas itself carries the colour, not just <body>, so overscroll and the
+ * gaps around the app never flash white.
+ */
+html {
+  background-color: var(--coin-bg);
+}
+
+/*
+ * A theme switch crossfades instead of snapping. Only the properties that
+ * actually change with the theme are animated, so hover transitions are
+ * untouched.
+ */
+body,
+.coin-auth,
+.coin-page,
+.coin-appbar {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+/* Respect a reduced-motion preference: no crossfade, no entrance animations. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
 }

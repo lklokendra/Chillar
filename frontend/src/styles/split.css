@@ -75,8 +75,8 @@
 
 .coin-split-input:focus {
   outline: none;
-  border-color: #000;
-  background: #fff;
+  border-color: var(--coin-ink);
+  background: var(--coin-surface);
   box-shadow: var(--coin-ring);
 }
 
@@ -103,8 +103,8 @@
 
 .coin-split-select:focus {
   outline: none;
-  border-color: #000;
-  background: #fff;
+  border-color: var(--coin-ink);
+  background: var(--coin-surface);
 }
 
 /* -------------------------------------------------------------- group list */
@@ -231,10 +231,10 @@
 
 .coin-split-open {
   padding: 9px 20px;
-  border: 1px solid #000;
+  border: 1px solid var(--coin-ink);
   border-radius: 9999px;
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   font-weight: 600;
@@ -243,7 +243,7 @@
 }
 
 .coin-split-open:hover {
-  background: #333;
+  background: var(--coin-ink-hover);
   transform: translateY(-1px);
   text-decoration: none;
 }
@@ -429,9 +429,9 @@
 }
 
 .coin-split-person__btn:hover:not(:disabled) {
-  border-color: #000;
-  background: #000;
-  color: #fff;
+  border-color: var(--coin-ink);
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 .coin-split-person__btn:disabled {
@@ -728,9 +728,383 @@
   font-size: 13px;
 }
 
+/* ----------------------------------------------------- settlement tracking */
+
+.coin-split-note {
+  max-width: 68ch;
+  margin: 6px 0 0;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--coin-text-soft);
+}
+
+/* Flag shown when a balance change left the logged records stale. */
+.coin-split-reconcile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--coin-amber);
+  border-left: 4px solid var(--coin-amber);
+  border-radius: var(--coin-radius);
+  background: var(--coin-amber-soft);
+}
+
+.coin-split-reconcile__text {
+  display: grid;
+  gap: 3px;
+}
+
+.coin-split-reconcile__title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: lowercase;
+  color: var(--coin-amber-ink);
+}
+
+.coin-split-reconcile__hint {
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--coin-amber-ink);
+  opacity: 0.85;
+}
+
+/* Four-up roll-up: owed / received / pending / still owed overall. */
+.coin-split-settle-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.coin-split-settle-card {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 16px 18px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius);
+  box-shadow: var(--coin-shadow-sm);
+}
+
+.coin-split-settle-card__value {
+  margin-top: 2px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--coin-text);
+}
+
+/* Rose = not settled yet, mint = money actually received. */
+.coin-split-settle-card--owed {
+  border-top: 4px solid var(--coin-primary);
+  background: var(--coin-primary-soft);
+}
+
+.coin-split-settle-card--received {
+  border-top: 4px solid var(--coin-mint);
+  background: var(--coin-mint-soft);
+}
+
+.coin-split-settle-card--pending {
+  border-top: 4px solid var(--coin-amber);
+  background: var(--coin-amber-soft);
+}
+
+.coin-split-settle-card--suggested {
+  border-top: 4px solid var(--coin-border-strong);
+  background: var(--coin-surface-soft);
+}
+
+/* Filter / sort bar above the settlement history list. */
+.coin-split-history-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.coin-split-history-bar__label {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-split-select--compact {
+  flex: none;
+  min-width: 140px;
+  max-width: 190px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.coin-split-records {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.coin-split-record {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border: 1px solid var(--coin-border);
+  border-left: 4px solid var(--coin-border-strong);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow-sm);
+  font-family: var(--coin-font-mono);
+}
+
+/* Colour the left edge by status: rose pending, amber part paid, mint paid. */
+.coin-split-record--pending {
+  border-left-color: var(--coin-rose);
+}
+
+.coin-split-record--partially_paid {
+  border-left-color: var(--coin-amber);
+  background: var(--coin-amber-soft);
+}
+
+.coin-split-record--paid {
+  border-left-color: var(--coin-mint);
+  background: var(--coin-mint-soft);
+}
+
+.coin-split-record__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.coin-split-record__route {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.coin-split-record__figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-left: 0;
+}
+
+.coin-split-record__figures .coin-split-figure {
+  min-width: 84px;
+  justify-items: start;
+  padding: 0 16px 0 0;
+  border-left: none;
+}
+
+.coin-split-record__figures .coin-split-figure + .coin-split-figure {
+  padding-left: 16px;
+  border-left: 1px solid var(--coin-border);
+}
+
+.coin-split-record__note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--coin-text-soft);
+}
+
+.coin-split-record__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.coin-split-pay-form {
+  flex: 1;
+}
+
+.coin-split-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.coin-split-status--pending {
+  background: var(--coin-rose-soft);
+  border: 1px solid var(--coin-rose);
+  color: var(--coin-rose-ink);
+}
+
+.coin-split-status--partially_paid {
+  background: var(--coin-amber-soft);
+  border: 1px solid var(--coin-amber);
+  color: var(--coin-amber-ink);
+}
+
+.coin-split-status--paid {
+  background: var(--coin-mint-soft);
+  border: 1px solid var(--coin-mint);
+  color: var(--coin-mint-ink);
+}
+
+/* Individual instalments of a settlement. */
+.coin-split-payments {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.coin-split-payment {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px dashed var(--coin-border-strong);
+  border-radius: 8px;
+  background: var(--coin-surface);
+  font-size: 12px;
+}
+
+.coin-split-payment__amount {
+  font-weight: 700;
+  color: var(--coin-text);
+}
+
+.coin-split-payment__date {
+  color: var(--coin-text-muted);
+}
+
+.coin-split-payment__note {
+  flex: 1;
+  min-width: 0;
+  color: var(--coin-text-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coin-split-payment .coin-split-person__btn {
+  margin-left: auto;
+}
+
+/* Audit trail stays folded away - it is reference material, not a headline. */
+.coin-split-audit {
+  margin-top: 16px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface);
+  box-shadow: var(--coin-shadow-sm);
+}
+
+.coin-split-audit__summary {
+  padding: 12px 16px;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-soft);
+  cursor: pointer;
+  list-style: none;
+}
+
+.coin-split-audit__summary::-webkit-details-marker {
+  display: none;
+}
+
+.coin-split-audit__summary::before {
+  content: '▸ ';
+  color: var(--coin-text-muted);
+}
+
+.coin-split-audit[open] .coin-split-audit__summary::before {
+  content: '▾ ';
+}
+
+.coin-split-audit__list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0 16px 12px;
+  list-style: none;
+}
+
+.coin-split-audit__item {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-top: 1px solid var(--coin-border);
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+}
+
+.coin-split-audit__action {
+  font-weight: 700;
+  color: var(--coin-text);
+}
+
+.coin-split-audit__detail {
+  color: var(--coin-text-soft);
+}
+
+.coin-split-audit__time {
+  color: var(--coin-text-muted);
+  white-space: nowrap;
+}
+
 /* -------------------------------------------------------------- responsive */
 
+@media (max-width: 900px) {
+  .coin-split-settle-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coin-split-audit__item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
 @media (max-width: 480px) {
+  .coin-split-card {
+    padding: 16px 16px;
+  }
+
+  .coin-split-settle-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coin-split-select--compact {
+    max-width: none;
+    width: 100%;
+  }
+
+  .coin-split-record__figures .coin-split-figure {
+    min-width: 0;
+    padding-right: 12px;
+  }
+
+  .coin-split-record__figures .coin-split-figure + .coin-split-figure {
+    padding-left: 12px;
+  }
+
   .coin-split-card {
     padding: 16px 16px;
   }

@@ -29,5 +29,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t WHERE t.user = :user")
     BigDecimal sumAmountByUser(@Param("user") User user);
 
+    /**
+     * Every khata entry inside an inclusive date range, oldest first. The
+     * category is fetched eagerly because the insights engine reads category
+     * names while open-in-view is disabled.
+     */
+    @Query("SELECT t FROM Transaction t LEFT JOIN FETCH t.category "
+            + "WHERE t.user = :user AND t.date BETWEEN :from AND :to ORDER BY t.date ASC, t.createdAt ASC")
+    List<Transaction> findByUserAndDateRange(@Param("user") User user,
+                                             @Param("from") java.time.LocalDate from,
+                                             @Param("to") java.time.LocalDate to);
+
     Optional<Transaction> findByIdAndUser(Long id, User user);
 }

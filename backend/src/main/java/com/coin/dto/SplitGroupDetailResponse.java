@@ -13,5 +13,8 @@ public record SplitGroupDetailResponse(
     List<SplitParticipantResponse> participants,
     List<ParticipantSummaryResponse> summary,
     List<SettlementInstructionResponse> settlements,
-    List<SplitExpenseResponse> expenses
+    List<SplitExpenseResponse> expenses,
+    List<SplitSettlementResponse> settlementRecords,
+    SettlementDashboardResponse settlementDashboard,
+    List<SettlementAuditResponse> settlementAudit
 ) {}

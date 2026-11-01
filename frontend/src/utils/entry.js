@@ -13,6 +13,12 @@ export const MISSING_AMOUNT = 'Please enter a spending amount before adding this
 /** Gullak says "amount" rather than "spending amount" — same rule, different words. */
 export const MISSING_GULLAK_AMOUNT = 'Please enter an amount before adding this to your gullak.'
 
+/** A gullak entry can only belong to one goal, so two hashtags are ambiguous. */
+export const TOO_MANY_GULLAK_TAGS = 'Use one hashtag only — that is the goal this entry goes into.'
+
+/** A goal name has to fit the column the server stores it in. */
+export const GOAL_NAME_TOO_LONG = 'That goal name is too long — keep it under 120 characters.'
+
 /**
  * Starter khatas shown to a brand new account. Each one disappears from the
  * suggestion row the moment the user logs an entry into a khata of that name.
@@ -34,6 +40,11 @@ const PRESET_COLORS = ['mint', 'yellow', 'blue', 'rose']
 export function tagInInput(value) {
   const match = value.match(TAG_PATTERN)
   return match ? match[1].toLowerCase() : null
+}
+
+/** Every "#tag" in the box, in the order they were typed. */
+export function tagsInInput(value) {
+  return (value.match(TAG_PATTERN_GLOBAL) ?? []).map((tag) => tag.slice(1))
 }
 
 /** Tags `value` with #name, swapping any tag already present. */
@@ -88,18 +99,32 @@ function isNumberish(token) {
  * arithmetic), the note and the khata straight from the entry box, so the UI can
  * preview the total and warn before anything is sent to the server.
  *
- * <p>Pass `{ tags: false }` for destinations with no khatas of their own (the
- * gullak): any "#word" then stays in the note instead of picking a category.
+ * <p>The gullak reuses this exact parser, but a hashtag there names a savings
+ * goal instead of a khata: the result carries `goal` (the tag as the user typed
+ * it, so the server can keep a friendly display name) as well as the lowercase
+ * `category`. Pass `{ singleTag: true }` where only one tag makes sense — a
+ * savings entry belongs to one goal, so "#laptop #goa" is rejected rather than
+ * silently filed under one of them.
  *
  * Never throws — failures come back as `error` so the caller can render them.
  */
-export function parseEntry(value, { tags = true, missingAmount = MISSING_AMOUNT } = {}) {
+export function parseEntry(value, { tags = true, singleTag = false, missingAmount = MISSING_AMOUNT } = {}) {
   const raw = (value ?? '').trim()
+  const typedTags = tags ? tagsInInput(raw) : []
   const category = tags ? tagInInput(raw) : null
-  const result = { amount: 0, note: '', category, hasAmount: false, error: '' }
+  const goal = typedTags[0] ?? null
+  const result = { amount: 0, note: '', category, goal, hasAmount: false, error: '' }
 
   if (!raw) {
     return { ...result, error: missingAmount }
+  }
+
+  if (singleTag && typedTags.length > 1) {
+    return { ...result, error: TOO_MANY_GULLAK_TAGS }
+  }
+
+  if (goal && goal.length > 120) {
+    return { ...result, error: GOAL_NAME_TOO_LONG }
   }
 
   const body = tags ? raw.replace(TAG_PATTERN_GLOBAL, ' ') : raw
@@ -140,6 +165,7 @@ export function parseEntry(value, { tags = true, missingAmount = MISSING_AMOUNT 
     amount,
     note: notes.join(' '),
     category,
+    goal,
     hasAmount: values.length > 0 && amount > 0,
     error: values.length > 0 && amount > 0 ? '' : missingAmount,
   }

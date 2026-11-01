@@ -25,7 +25,7 @@ h2,
 h3 {
   margin: 0;
   text-transform: lowercase;
-  color: #000;
+  color: var(--coin-ink);
   font-weight: 900;
 }
 
@@ -33,7 +33,7 @@ p {
   margin: 0;
   font-family: var(--coin-font-mono);
   font-size: 14px;
-  color: #000;
+  color: var(--coin-ink);
 }
 
 a {
@@ -60,8 +60,8 @@ a:hover {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
   font-family: var(--coin-font-mono);
   font-size: 18px;
   font-weight: 900;
@@ -74,7 +74,7 @@ a:hover {
   letter-spacing: -0.05em;
   line-height: 1;
   text-transform: lowercase;
-  color: #000;
+  color: var(--coin-ink);
   font-family: var(--coin-font);
 }
 
@@ -181,17 +181,17 @@ a:hover {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #000;
+  color: var(--coin-ink);
   margin-bottom: 4px;
 }
 
 .coin-field__input {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--coin-field-border);
   border-radius: 8px;
-  background: #fcfcfc;
-  color: #000;
+  background: var(--coin-field-bg);
+  color: var(--coin-ink);
   font-family: var(--coin-font-mono);
   font-size: 14px;
   transition: all 0.2s ease;
@@ -199,9 +199,9 @@ a:hover {
 
 .coin-field__input:focus {
   outline: none;
-  border-color: #000;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border-color: var(--coin-ink);
+  background: var(--coin-field-bg-focus);
+  box-shadow: var(--coin-shadow-field);
 }
 
 .coin-field__input:focus {
@@ -232,7 +232,7 @@ a:hover {
   justify-content: center;
   gap: 7px;
   padding: 12px 32px;
-  border: 1px solid #000;
+  border: 1px solid var(--coin-ink);
   border-radius: 9999px;
   font-family: var(--coin-font-mono);
   font-size: 14px;
@@ -242,12 +242,12 @@ a:hover {
 }
 
 .coin-btn--primary {
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 .coin-btn--primary:hover:not(:disabled) {
-  background: #333;
+  background: var(--coin-ink-hover);
 }
 
 /* Pill/Badge styles from screenshots */
@@ -264,19 +264,19 @@ a:hover {
 /* ------------------------------------------------------- khata accordion */
 
 .coin-khata {
-  border: 1px solid #eee;
+  border: 1px solid var(--coin-chip-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--coin-surface);
   overflow: hidden;
   transition: border-color 0.15s ease;
 }
 
 .coin-khata:hover {
-  border-color: #ccc;
+  border-color: var(--coin-border-strong);
 }
 
 .coin-khata.is-open {
-  border-color: #000;
+  border-color: var(--coin-ink);
 }
 
 .coin-khata__head {
@@ -318,33 +318,33 @@ a:hover {
   width: 22px;
   height: 22px;
   border-radius: 9999px;
-  background: #f4f4f4;
+  background: var(--coin-chip-bg);
   font-family: var(--coin-font-mono);
   font-size: 14px;
   line-height: 1;
-  color: #666;
+  color: var(--coin-control-text);
 }
 
 .coin-khata.is-open .coin-khata__caret {
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 .coin-khata__body {
   padding: 0 18px 10px;
-  border-top: 1px solid #f5f5f5;
+  border-top: 1px solid var(--coin-hairline);
 }
 
 /* Each khata gets a light wash keyed to its badge colour. */
-.coin-khata--mint { background: #f2fbf9; border-color: #d6efe9; }
-.coin-khata--yellow { background: #fffdf3; border-color: #f3ebc9; }
-.coin-khata--blue { background: #f4f9ff; border-color: #d6e6f7; }
-.coin-khata--rose { background: #fff6f7; border-color: #f7d9df; }
+.coin-khata--mint { background: var(--coin-mint-card); border-color: var(--coin-mint-card-line); }
+.coin-khata--yellow { background: var(--coin-amber-card); border-color: var(--coin-amber-card-line); }
+.coin-khata--blue { background: var(--coin-blue-card); border-color: var(--coin-blue-card-line); }
+.coin-khata--rose { background: var(--coin-rose-card); border-color: var(--coin-rose-card-line); }
 
-.coin-khata--mint.is-open { border-color: #0d9488; }
-.coin-khata--yellow.is-open { border-color: #d97706; }
-.coin-khata--blue.is-open { border-color: #2563eb; }
-.coin-khata--rose.is-open { border-color: #e11d48; }
+.coin-khata--mint.is-open { border-color: var(--coin-mint); }
+.coin-khata--yellow.is-open { border-color: var(--coin-amber); }
+.coin-khata--blue.is-open { border-color: var(--coin-blue); }
+.coin-khata--rose.is-open { border-color: var(--coin-rose); }
 
 /* Inline "add an entry to this khata" row inside the dropdown. */
 .coin-khata__add {
@@ -357,27 +357,27 @@ a:hover {
   flex: 1;
   min-width: 0;
   padding: 9px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--coin-field-border);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--coin-overlay);
   font-family: var(--coin-font-mono);
   font-size: 12px;
-  color: #000;
+  color: var(--coin-ink);
   outline: none;
 }
 
 .coin-khata__add-input:focus {
-  border-color: #000;
-  background: #fff;
+  border-color: var(--coin-ink);
+  background: var(--coin-field-bg-focus);
 }
 
 .coin-khata__add-btn {
   flex-shrink: 0;
   padding: 0 16px;
-  border: 1px solid #000;
+  border: 1px solid var(--coin-ink);
   border-radius: 8px;
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   font-weight: 600;
@@ -416,10 +416,10 @@ a:hover {
 
 .coin-suggest__chip {
   padding: 5px 12px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--coin-ghost-border);
   border-radius: 9999px;
-  background: #fafafa;
-  color: #555;
+  background: var(--coin-chip-bg);
+  color: var(--coin-control-text-soft);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   cursor: pointer;
@@ -427,20 +427,20 @@ a:hover {
 }
 
 .coin-suggest__chip:hover {
-  border-color: #000;
-  color: #000;
+  border-color: var(--coin-ink);
+  color: var(--coin-ink);
 }
 
 /* Light colour per preset chip, matching its khata wash. */
-.coin-suggest__chip--mint { background: #e0f2f1; border-color: #bfe6e1; color: #0f5e58; }
-.coin-suggest__chip--yellow { background: #fffde7; border-color: #f2e9b8; color: #8a6d00; }
-.coin-suggest__chip--blue { background: #e3f2fd; border-color: #c3e0f5; color: #14568c; }
-.coin-suggest__chip--rose { background: #fff1f2; border-color: #f7d9df; color: #9f1239; }
+.coin-suggest__chip--mint { background: var(--coin-mint-chip); border-color: var(--coin-mint-chip-line); color: var(--coin-mint-chip-ink); }
+.coin-suggest__chip--yellow { background: var(--coin-amber-chip); border-color: var(--coin-amber-chip-line); color: var(--coin-amber-chip-ink); }
+.coin-suggest__chip--blue { background: var(--coin-blue-soft-2); border-color: var(--coin-blue-line-2); color: var(--coin-blue-ink); }
+.coin-suggest__chip--rose { background: var(--coin-rose-soft); border-color: var(--coin-rose-card-line); color: var(--coin-rose-ink); }
 
 .coin-suggest__chip.is-active {
-  border-color: #000;
-  background: #000;
-  color: #fff;
+  border-color: var(--coin-ink);
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 .coin-muted {
@@ -455,17 +455,17 @@ a:hover {
   font-family: inherit;
   font-size: 32px;
   font-weight: 900;
-  color: #ccc;
+  color: var(--coin-placeholder);
   outline: none;
   background: transparent;
 }
 
 .coin-entry-input:focus {
-  color: #000;
+  color: var(--coin-ink);
 }
 
 .coin-entry-input::placeholder {
-  color: #eee;
+  color: var(--coin-placeholder-soft);
 }
 
 .coin-entry-meta {
@@ -476,7 +476,7 @@ a:hover {
   gap: 10px;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--coin-hairline);
 }
 
 .coin-entry-date {
@@ -487,26 +487,26 @@ a:hover {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: #000;
+  color: var(--coin-ink);
   opacity: 0.5;
 }
 
 .coin-entry-date input {
   padding: 4px 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--coin-field-border);
   border-radius: 6px;
-  background: #fcfcfc;
+  background: var(--coin-field-bg);
   font-family: var(--coin-font-mono);
   font-size: 12px;
-  color: #000;
+  color: var(--coin-ink);
   opacity: 1;
   cursor: pointer;
 }
 
 .coin-entry-date input:focus {
   outline: none;
-  border-color: #000;
-  background: #fff;
+  border-color: var(--coin-ink);
+  background: var(--coin-field-bg-focus);
 }
 
 .coin-entry-hint {
@@ -533,15 +533,15 @@ a:hover {
   font-size: 30px;
   font-weight: 900;
   line-height: 1;
-  color: #000;
+  color: var(--coin-ink);
 }
 
 /* The running total of what has been typed, shown before saving. */
 .coin-entry-preview {
   padding: 6px 14px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.85);
-  color: #000;
+  background: var(--coin-overlay);
+  color: var(--coin-ink);
   font-family: var(--coin-font-mono);
   font-size: 13px;
   font-weight: 600;
@@ -555,10 +555,10 @@ a:hover {
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 1px solid #000;
+  border: 1px solid var(--coin-ink);
   border-radius: 9999px;
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
   font-size: 22px;
   line-height: 1;
   cursor: pointer;
@@ -567,7 +567,7 @@ a:hover {
 
 .coin-add-btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--coin-shadow-lift);
 }
 
 .coin-add-btn:disabled {
@@ -598,12 +598,12 @@ a:hover {
   justify-content: space-between;
   gap: 16px;
   padding: 12px 10px;
-  border-bottom: 1px solid #f2f2f2;
+  border-bottom: 1px solid var(--coin-hairline);
   font-family: var(--coin-font-mono);
 }
 
 .coin-log:hover {
-  background: #fafafa;
+  background: var(--coin-chip-bg);
 }
 
 .coin-log__main {
@@ -629,7 +629,7 @@ a:hover {
 
 .coin-log__note {
   font-size: 14px;
-  color: #000;
+  color: var(--coin-ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -652,10 +652,10 @@ a:hover {
   width: 26px;
   height: 26px;
   padding: 0;
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--coin-ghost-border);
   border-radius: 9999px;
-  background: #fff;
-  color: #bbb;
+  background: var(--coin-surface);
+  color: var(--coin-ghost-text);
   font-family: var(--coin-font-mono);
   font-size: 15px;
   line-height: 1;
@@ -664,9 +664,9 @@ a:hover {
 }
 
 .coin-log__delete:hover:not(:disabled) {
-  border-color: #000;
-  background: #000;
-  color: #fff;
+  border-color: var(--coin-ink);
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 .coin-log__delete:disabled {
@@ -674,14 +674,14 @@ a:hover {
   opacity: 0.5;
 }
 
-.coin-pill--mint { background: #e0f2f1; color: #000; }
-.coin-pill--yellow { background: #fffde7; color: #000; }
-.coin-pill--blue { background: #e3f2fd; color: #000; }
-.coin-pill--rose { background: #fff1f2; color: #000; }
+.coin-pill--mint { background: var(--coin-mint-chip); color: var(--coin-ink); }
+.coin-pill--yellow { background: var(--coin-amber-chip); color: var(--coin-ink); }
+.coin-pill--blue { background: var(--coin-blue-soft-2); color: var(--coin-ink); }
+.coin-pill--rose { background: var(--coin-rose-soft); color: var(--coin-ink); }
 .coin-pill--ghost {
-  border: 1px solid #eee;
+  border: 1px solid var(--coin-chip-border);
   background: transparent;
-  color: #aaa;
+  color: var(--coin-ghost-text-soft);
 }
 
 .coin-btn--amber {
@@ -769,15 +769,15 @@ a:hover {
   align-items: center;
   gap: 6px;
   padding: 5px;
-  border: 1px solid #eee;
+  border: 1px solid var(--coin-chip-border);
   border-radius: 9999px;
-  background: #fafafa;
+  background: var(--coin-chip-bg);
 }
 
 .coin-nav__link {
   padding: 6px 16px;
   border-radius: 9999px;
-  color: #666;
+  color: var(--coin-control-text);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   font-weight: 600;
@@ -786,13 +786,13 @@ a:hover {
 }
 
 .coin-nav__link:hover {
-  color: #000;
+  color: var(--coin-ink);
   text-decoration: none;
 }
 
 .coin-nav__link.is-active {
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
 }
 
 .coin-account {
@@ -819,7 +819,7 @@ a:hover {
 .coin-search-bar {
   width: 100%;
   padding: 10px 16px;
-  border: 1px solid #eee;
+  border: 1px solid var(--coin-chip-border);
   border-radius: 8px;
   font-family: var(--coin-font-mono);
   font-size: 13px;
@@ -828,7 +828,7 @@ a:hover {
 }
 
 .coin-search-bar:focus {
-  border-color: #000;
+  border-color: var(--coin-ink);
 }
 
 .coin-page__title {
@@ -854,32 +854,32 @@ a:hover {
   position: relative;
   overflow: hidden;
   padding: 24px;
-  border: 1px solid #eee;
+  border: 1px solid var(--coin-chip-border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--coin-surface);
   transition: all 0.2s ease;
 }
 
 .coin-tile:hover {
-  border-color: #000;
+  border-color: var(--coin-ink);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+  box-shadow: var(--coin-shadow-hover);
 }
 
-.coin-tile--ink { border-color: #14161a; border-top: 4px solid #14161a; background: #14161a; }
-.coin-tile--mint { border-color: #cdeee3; border-top: 4px solid #0d9488; background: #ecfdf5; }
-.coin-tile--blue { border-color: #d3e4fb; border-top: 4px solid #2563eb; background: #eff6ff; }
-.coin-tile--rose { border-color: #f7d9df; border-top: 4px solid #e11d48; background: #fff1f2; }
+.coin-tile--ink { border-color: var(--coin-tile-ink-bg); border-top: 4px solid var(--coin-tile-ink-bg); background: var(--coin-tile-ink-bg); }
+.coin-tile--mint { border-color: var(--coin-mint-card-line); border-top: 4px solid var(--coin-mint); background: var(--coin-mint-soft); }
+.coin-tile--blue { border-color: var(--coin-blue-line); border-top: 4px solid var(--coin-blue); background: var(--coin-blue-soft); }
+.coin-tile--rose { border-color: var(--coin-rose-card-line); border-top: 4px solid var(--coin-rose); background: var(--coin-rose-soft); }
 
-.coin-tile--ink .coin-tile__label { color: rgba(255, 255, 255, 0.55); }
-.coin-tile--ink .coin-tile__value { color: #fff; }
-.coin-tile--ink .coin-tile__note { color: rgba(255, 255, 255, 0.6); }
+.coin-tile--ink .coin-tile__label { color: var(--coin-tile-ink-muted); }
+.coin-tile--ink .coin-tile__value { color: var(--coin-tile-ink-text); }
+.coin-tile--ink .coin-tile__note { color: var(--coin-tile-ink-muted-2); }
 
 .coin-tile--ink:hover,
 .coin-tile--mint:hover,
 .coin-tile--blue:hover,
 .coin-tile--rose:hover {
-  border-color: #000;
+  border-color: var(--coin-ink);
 }
 
 .coin-tile__label {
@@ -887,7 +887,7 @@ a:hover {
   font-size: 11px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #000;
+  color: var(--coin-ink);
   opacity: 0.5;
 }
 
@@ -912,6 +912,23 @@ a:hover {
   font-weight: 700;
 }
 
+/* Section heading with a small right-aligned tally beside it. */
+.coin-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.coin-section__note {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coin-text-muted);
+}
+
 .coin-empty {
   margin-top: 10px;
   padding: 22px;
@@ -933,10 +950,10 @@ a:hover {
   width: 100%;
   margin-top: 32px;
   padding: 20px 24px;
-  border: 1px solid #000;
+  border: 1px solid var(--coin-ink);
   border-radius: 16px;
-  background: #000;
-  color: #fff;
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -944,7 +961,7 @@ a:hover {
 
 .coin-history-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--coin-shadow-cta);
 }
 
 .coin-history-btn__text {
@@ -989,21 +1006,46 @@ a:hover {
 .coin-history-bar__clear {
   flex-shrink: 0;
   padding: 9px 14px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--coin-field-border);
   border-radius: 8px;
-  background: #fafafa;
-  color: #555;
+  background: var(--coin-chip-bg);
+  color: var(--coin-control-text-soft);
   font-family: var(--coin-font-mono);
   font-size: 12px;
   cursor: pointer;
 }
 
 .coin-history-bar__clear:hover {
-  border-color: #000;
-  color: #000;
+  border-color: var(--coin-ink);
+  color: var(--coin-ink);
 }
 
 /* ----------------------------------------------------------- responsive */
+
+/* Six sections no longer fit beside the brand, so wrap the bar and let the
+   nav scroll horizontally instead of squeezing the labels. */
+@media (max-width: 860px) {
+  .coin-appbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .coin-nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .coin-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .coin-nav__link {
+    flex: 0 0 auto;
+  }
+}
 
 @media (max-width: 480px) {
   .coin-auth {
@@ -1023,19 +1065,8 @@ a:hover {
     grid-template-columns: 1fr;
   }
 
-  .coin-appbar {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .coin-nav {
-    order: 3;
-    width: 100%;
-    justify-content: space-between;
-  }
-
   .coin-nav__link {
-    padding: 6px 10px;
+    padding: 6px 12px;
     font-size: 11px;
   }
 
@@ -1045,5 +1076,82 @@ a:hover {
 
   .coin-entry-input {
     font-size: 24px;
+  }
+}
+
+/* ---------------------------------------------------------- theme switch */
+
+.coin-appbar__side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coin-auth__theme {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 5;
+}
+
+.coin-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--coin-chip-border);
+  border-radius: 9999px;
+  background: var(--coin-chip-bg);
+}
+
+.coin-theme__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--coin-control-text);
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.coin-theme__btn:hover {
+  color: var(--coin-ink);
+}
+
+.coin-theme__btn.is-active {
+  background: var(--coin-ink);
+  color: var(--coin-on-ink);
+}
+
+.coin-theme__btn:focus-visible {
+  outline: 2px solid var(--coin-primary);
+  outline-offset: 2px;
+}
+
+.coin-theme__icon {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.coin-theme__label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 560px) {
+  .coin-theme__label {
+    display: none;
   }
 }

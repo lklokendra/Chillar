@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.coin.dto.SettlementAuditResponse;
+import com.coin.dto.SettlementPaymentRequest;
+import com.coin.dto.SettlementRequest;
 import com.coin.dto.SplitExpenseRequest;
 import com.coin.dto.SplitExpenseResponse;
 import com.coin.dto.SplitGroupDetailResponse;
@@ -23,6 +26,7 @@ import com.coin.dto.SplitGroupRequest;
 import com.coin.dto.SplitGroupResponse;
 import com.coin.dto.SplitParticipantRequest;
 import com.coin.dto.SplitParticipantResponse;
+import com.coin.dto.SplitSettlementResponse;
 import com.coin.entity.User;
 import com.coin.repository.UserRepository;
 import com.coin.service.SplitService;
@@ -128,6 +132,65 @@ public class SplitController {
                               @PathVariable Long groupId,
                               @PathVariable Long expenseId) {
         splitService.deleteExpense(currentUser(userDetails), groupId, expenseId);
+    }
+
+    // ------------------------------------------------------------- settlements
+
+    @GetMapping("/groups/{groupId}/settlements")
+    public ResponseEntity<List<SplitSettlementResponse>> listSettlements(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long groupId) {
+        return ResponseEntity.ok(splitService.listSettlements(currentUser(userDetails), groupId));
+    }
+
+    @PostMapping("/groups/{groupId}/settlements")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SplitSettlementResponse recordSettlement(@AuthenticationPrincipal UserDetails userDetails,
+                                                    @PathVariable Long groupId,
+                                                    @Valid @RequestBody SettlementRequest request) {
+        return splitService.recordSettlement(currentUser(userDetails), groupId, request);
+    }
+
+    @DeleteMapping("/groups/{groupId}/settlements/{settlementId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteSettlement(@AuthenticationPrincipal UserDetails userDetails,
+                                 @PathVariable Long groupId,
+                                 @PathVariable Long settlementId) {
+        splitService.deleteSettlement(currentUser(userDetails), groupId, settlementId);
+    }
+
+    /** Mark as paid (omit the amount) or record a partial instalment. */
+    @PostMapping("/groups/{groupId}/settlements/{settlementId}/payments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SplitSettlementResponse recordPayment(@AuthenticationPrincipal UserDetails userDetails,
+                                                 @PathVariable Long groupId,
+                                                 @PathVariable Long settlementId,
+                                                 @Valid @RequestBody SettlementPaymentRequest request) {
+        return splitService.recordPayment(currentUser(userDetails), groupId, settlementId, request);
+    }
+
+    @DeleteMapping("/groups/{groupId}/settlements/{settlementId}/payments/{paymentId}")
+    public ResponseEntity<SplitSettlementResponse> removePayment(@AuthenticationPrincipal UserDetails userDetails,
+                                                                 @PathVariable Long groupId,
+                                                                 @PathVariable Long settlementId,
+                                                                 @PathVariable Long paymentId) {
+        return ResponseEntity.ok(
+                splitService.removePayment(currentUser(userDetails), groupId, settlementId, paymentId));
+    }
+
+    @GetMapping("/groups/{groupId}/settlements/history")
+    public ResponseEntity<List<SettlementAuditResponse>> settlementHistory(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long groupId) {
+        return ResponseEntity.ok(splitService.settlementHistory(currentUser(userDetails), groupId));
+    }
+
+    /** Clears the reconciliation flag after the user has reviewed the records. */
+    @PostMapping("/groups/{groupId}/settlements/reconcile")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void markReconciled(@AuthenticationPrincipal UserDetails userDetails,
+                               @PathVariable Long groupId) {
+        splitService.markReconciled(currentUser(userDetails), groupId);
     }
 
     private User currentUser(UserDetails userDetails) {

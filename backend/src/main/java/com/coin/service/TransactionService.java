@@ -145,7 +145,7 @@ public class TransactionService {
     }
 
     private Category findOrCreateCategory(User user, String name) {
-        String slug = name.toLowerCase();
+        String slug = name == null || name.isBlank() ? DEFAULT_CATEGORY : name.toLowerCase();
         return categoryRepository.findByUserAndNameIgnoreCase(user, slug)
                 .orElseGet(() -> {
                     Category newCat = new Category();

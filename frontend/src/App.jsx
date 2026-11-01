@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './routes/ProtectedRoute'
 import DashboardPage from './pages/DashboardPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import GullakGoalPage from './pages/GullakGoalPage'
 import GullakHistoryPage from './pages/GullakHistoryPage'
 import GullakPage from './pages/GullakPage'
 import HistoryPage from './pages/HistoryPage'
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/gullak" element={<GullakPage />} />
         <Route path="/gullak/history" element={<GullakHistoryPage />} />
+        <Route path="/gullak/goals/:goalId" element={<GullakGoalPage />} />
         <Route path="/split" element={<SplitPage />} />
         <Route path="/split/:groupId" element={<SplitGroupPage />} />
       </Route>
