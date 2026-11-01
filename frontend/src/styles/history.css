@@ -1,0 +1,295 @@
+/*
+ * History page styles.
+ *
+ * Everything here is namespaced under .coin-history-page so the khata / log
+ * overrides never leak into the Dashboard, which renders the very same shared
+ * KhataAccordion component (classes .coin-khata / .coin-log / .coin-pill live
+ * in global.css). Only the summary strip reuses global .coin-grid / .coin-tile
+ * modifiers, scoped so the Dashboard is unaffected.
+ *
+ * The hues below mirror the existing khata wash system in global.css exactly:
+ * mint #f2fbf9/#d6efe9, yellow #fffdf3/#f3ebc9, blue #f4f9ff/#d6e6f7,
+ * rose #fff6f7/#f7d9df (open borders #0d9488 / #d97706 / #2563eb / #e11d48).
+ */
+
+/* ------------------------------------------------- summary strip */
+
+.coin-history-summary {
+  margin-top: 22px;
+}
+
+.coin-history-summary .coin-tile__value {
+  font-family: var(--coin-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------- search + sort */
+
+.coin-history-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.coin-history-controls .coin-history-bar {
+  flex: 1 1 260px;
+}
+
+.coin-history-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coin-history-sort__label {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-history-sort__pills {
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid var(--coin-border);
+  border-radius: 9999px;
+  background: #fafafa;
+}
+
+.coin-history-sort__btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: #666;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.coin-history-sort__btn:hover {
+  color: #000;
+}
+
+.coin-history-sort__btn.is-active {
+  background: #000;
+  color: #fff;
+}
+
+.coin-history-sort__btn:focus-visible {
+  outline: 2px solid var(--coin-primary);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------- empty states */
+
+.coin-history-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 36px 22px;
+  border: 1px dashed var(--coin-border-strong);
+  border-radius: var(--coin-radius-lg);
+  background: var(--coin-surface-soft);
+  text-align: center;
+}
+
+.coin-history-empty__glyph {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 6px;
+  border: 1px solid var(--coin-border);
+  border-radius: 9999px;
+  background: var(--coin-mark-fill);
+  color: var(--coin-text-soft);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.coin-history-empty__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--coin-text);
+}
+
+.coin-history-empty__text {
+  max-width: 36ch;
+  font-size: 12px;
+  color: var(--coin-text-muted);
+}
+
+.coin-history-empty__action {
+  margin-top: 8px;
+  padding: 8px 18px;
+  border: 1px solid #000;
+  border-radius: 9999px;
+  background: #000;
+  color: #fff;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-history-empty__action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+.coin-history-empty--loading .coin-history-empty__glyph {
+  animation: coin-history-spin 1.2s linear infinite;
+}
+
+@keyframes coin-history-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --------------------------------------------------- khata container */
+
+.coin-history-page .coin-khata {
+  border-radius: var(--coin-radius-lg);
+  box-shadow: var(--coin-shadow-sm);
+}
+
+.coin-history-page .coin-khata__head {
+  padding: 16px 20px;
+}
+
+.coin-history-page .coin-khata__body {
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(20, 22, 26, 0.06);
+}
+
+.coin-history-page .coin-khata__add {
+  margin: 12px 4px 10px;
+}
+
+/* ------------------------------- colourful, scannable transaction rows */
+
+.coin-history-page .coin-khata .coin-log {
+  gap: 14px;
+  margin-top: 8px;
+  padding: 11px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--coin-radius);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: inset 3px 0 0 0 var(--coin-border-strong);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.coin-history-page .coin-khata .coin-log:hover {
+  background: #fff;
+}
+
+/* Reinforce each khata's own pastel wash with a matching left accent. */
+.coin-history-page .coin-khata--mint .coin-log {
+  border-color: #d6efe9;
+  box-shadow: inset 3px 0 0 0 #0d9488;
+}
+
+.coin-history-page .coin-khata--yellow .coin-log {
+  border-color: #f3ebc9;
+  box-shadow: inset 3px 0 0 0 #d97706;
+}
+
+.coin-history-page .coin-khata--blue .coin-log {
+  border-color: #d6e6f7;
+  box-shadow: inset 3px 0 0 0 #2563eb;
+}
+
+.coin-history-page .coin-khata--rose .coin-log {
+  border-color: #f7d9df;
+  box-shadow: inset 3px 0 0 0 #e11d48;
+}
+
+/* Keep the card border on the final row (global.css removes it). */
+.coin-history-page .coin-khata__body .coin-log:last-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.coin-history-page .coin-khata--mint .coin-log:last-child {
+  border-bottom-color: #d6efe9;
+}
+
+.coin-history-page .coin-khata--yellow .coin-log:last-child {
+  border-bottom-color: #f3ebc9;
+}
+
+.coin-history-page .coin-khata--blue .coin-log:last-child {
+  border-bottom-color: #d6e6f7;
+}
+
+.coin-history-page .coin-khata--rose .coin-log:last-child {
+  border-bottom-color: #f7d9df;
+}
+
+/* Note truncates gracefully; the right block keeps its fixed column. */
+.coin-history-page .coin-log__main {
+  min-width: 0;
+}
+
+.coin-history-page .coin-log__note {
+  color: var(--coin-text);
+}
+
+.coin-history-page .coin-log__meta {
+  font-family: var(--coin-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+.coin-history-page .coin-log__right {
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+/* Every entry is money out, so the amount always reads as a rose expense. */
+.coin-history-page .coin-log__amount {
+  min-width: 5.5ch;
+  text-align: right;
+  color: var(--coin-rose-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------- responsive */
+
+@media (max-width: 560px) {
+  .coin-history-controls {
+    align-items: stretch;
+  }
+
+  .coin-history-sort {
+    width: 100%;
+  }
+
+  .coin-history-sort__pills {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .coin-history-page .coin-log {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .coin-history-page .coin-log__amount {
+    min-width: 0;
+  }
+}

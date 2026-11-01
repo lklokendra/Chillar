@@ -1,15 +1,36 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Button from '../components/Button'
-import Brand from '../components/Brand'
 import KhataAccordion from '../components/KhataAccordion'
+import TopBar from '../components/TopBar'
 import { useAuth } from '../context/AuthContext'
 import * as transactionApi from '../api/transactions'
 import { errorMessage } from '../api/client'
+import '../styles/history.css'
+
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'newest', aria: 'Newest first' },
+  { value: 'oldest', label: 'oldest', aria: 'Oldest first' },
+  { value: 'amount-desc', label: '₹ high', aria: 'Amount high to low' },
+  { value: 'amount-asc', label: '₹ low', aria: 'Amount low to high' },
+]
+
+/** Client-side ordering of the already-loaded entries for one khata. */
+function sortEntries(entries, sortBy) {
+  const list = [...entries]
+  switch (sortBy) {
+    case 'oldest':
+      return list.sort((a, b) => String(a.date).localeCompare(String(b.date)))
+    case 'amount-desc':
+      return list.sort((a, b) => Number(b.amount) - Number(a.amount))
+    case 'amount-asc':
+      return list.sort((a, b) => Number(a.amount) - Number(b.amount))
+    case 'newest':
+    default:
+      return list.sort((a, b) => String(b.date).localeCompare(String(a.date)))
+  }
+}
 
 export default function HistoryPage() {
-  const navigate = useNavigate()
-  const { isGuest, signOut } = useAuth()
+  const { isGuest } = useAuth()
   const [khatas, setKhatas] = useState([])
   const [transactions, setTransactions] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -19,6 +40,7 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [sortBy, setSortBy] = useState('newest')
 
   const spendKhatas = khatas.filter((k) => k.name !== 'all')
   const totalAll = Number(khatas.find((k) => k.name === 'all')?.total ?? 0)
@@ -38,7 +60,7 @@ export default function HistoryPage() {
     entriesByKhata[transaction.categoryName].push(transaction)
   }
 
-  const entriesFor = (name) => (entriesByKhata[name] ?? []).filter(matchesQuery)
+  const entriesFor = (name) => sortEntries((entriesByKhata[name] ?? []).filter(matchesQuery), sortBy)
   // While searching, only khatas with hits stay on screen.
   const listedKhatas = query ? spendKhatas.filter((k) => entriesFor(k.name).length > 0) : spendKhatas
 
@@ -106,38 +128,73 @@ export default function HistoryPage() {
 
   return (
     <div className="coin-page">
-      <header className="coin-topbar" style={{ padding: '14px 0', border: 'none', justifyContent: 'space-between' }}>
-        <Brand showTag={false} />
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
-            ← back
-          </Button>
-          <Button variant="ghost" size="sm" onClick={signOut}>
-            Sign out
-          </Button>
-        </div>
-      </header>
+      <TopBar />
 
-      <div style={{ marginTop: '20px' }}>
+      <div className="coin-history-page" style={{ marginTop: '20px' }}>
         <h1 className="coin-page__title">history</h1>
         <p className="coin-page__subtitle" style={{ marginBottom: '32px' }}>
           every khata, every entry — ₹ {totalAll.toLocaleString()} logged
           {isGuest ? ' as a guest' : ''}.
         </p>
 
-        <div className="coin-history-bar">
-          <input
-            className="coin-search-bar"
-            placeholder="Search notes, categories or amounts..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ marginBottom: 0 }}
-          />
-          {searchQuery && (
-            <button type="button" className="coin-history-bar__clear" onClick={() => setSearchQuery('')}>
-              clear
-            </button>
-          )}
+        {!loading && (
+          <div className="coin-grid coin-history-summary">
+            <div className="coin-tile coin-tile--ink">
+              <div className="coin-tile__label">total logged</div>
+              <div className="coin-tile__value">₹ {totalAll.toLocaleString()}</div>
+              <div className="coin-tile__note">across every khata</div>
+            </div>
+            <div className="coin-tile coin-tile--mint">
+              <div className="coin-tile__label">khatas</div>
+              <div className="coin-tile__value">{spendKhatas.length}</div>
+              <div className="coin-tile__note">
+                {spendKhatas.length === 1 ? 'active category' : 'active categories'}
+              </div>
+            </div>
+            <div className="coin-tile coin-tile--blue">
+              <div className="coin-tile__label">entries</div>
+              <div className="coin-tile__value">{transactions.length}</div>
+              <div className="coin-tile__note">logged expenses</div>
+            </div>
+          </div>
+        )}
+
+        <div className="coin-history-controls">
+          <div className="coin-history-bar">
+            <input
+              className="coin-search-bar"
+              placeholder="Search notes, categories or amounts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ marginBottom: 0 }}
+              aria-label="Search entries"
+            />
+            {searchQuery && (
+              <button type="button" className="coin-history-bar__clear" onClick={() => setSearchQuery('')}>
+                clear
+              </button>
+            )}
+          </div>
+
+          <div className="coin-history-sort" role="group" aria-label="Sort entries">
+            <span className="coin-history-sort__label" aria-hidden="true">
+              sort
+            </span>
+            <div className="coin-history-sort__pills">
+              {SORT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`coin-history-sort__btn ${sortBy === option.value ? 'is-active' : ''}`}
+                  onClick={() => setSortBy(option.value)}
+                  aria-pressed={sortBy === option.value}
+                  aria-label={option.aria}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {notice && (
@@ -152,16 +209,45 @@ export default function HistoryPage() {
         )}
 
         <div style={{ display: 'grid', gap: '12px', marginTop: '24px' }}>
-          {loading && <div className="coin-muted">Loading khatas...</div>}
+          {loading && (
+            <div className="coin-history-empty coin-history-empty--loading" role="status">
+              <span className="coin-history-empty__glyph" aria-hidden="true">
+                ◔
+              </span>
+              <p className="coin-history-empty__title">Loading your khatas…</p>
+              <p className="coin-history-empty__text">Gathering every entry, one moment.</p>
+            </div>
+          )}
 
           {!loading && spendKhatas.length === 0 && (
-            <div className="coin-muted">
-              No khatas yet. Go back and log something like “100 chai #food”.
+            <div className="coin-history-empty">
+              <span className="coin-history-empty__glyph" aria-hidden="true">
+                ✎
+              </span>
+              <p className="coin-history-empty__title">No khatas yet</p>
+              <p className="coin-history-empty__text">
+                Log something like “100 chai #food” and it will show up here.
+              </p>
             </div>
           )}
 
           {!loading && spendKhatas.length > 0 && listedKhatas.length === 0 && (
-            <div className="coin-muted">No entries match “{searchQuery}”.</div>
+            <div className="coin-history-empty">
+              <span className="coin-history-empty__glyph" aria-hidden="true">
+                ⌕
+              </span>
+              <p className="coin-history-empty__title">No entries match “{searchQuery}”</p>
+              <p className="coin-history-empty__text">
+                Try a different note, category or amount.
+              </p>
+              <button
+                type="button"
+                className="coin-history-empty__action"
+                onClick={() => setSearchQuery('')}
+              >
+                clear
+              </button>
+            </div>
           )}
 
           {listedKhatas.map((khata) => {

@@ -1,6 +1,17 @@
 /** Shared helpers for the one-line entry format and the khata suggestions. */
 
+import { evaluateExpression, roundMoney } from './arithmetic'
+
 export const TAG_PATTERN = /#([\p{L}\p{N}_-]+)/u
+
+const TAG_PATTERN_GLOBAL = /#[\p{L}\p{N}_-]+/gu
+const NUMBERISH = /^[0-9+\-*/().,]+$/
+const OPERATORISH = /^[+\-*/()]+$/
+
+export const MISSING_AMOUNT = 'Please enter a spending amount before adding this expense.'
+
+/** Gullak says "amount" rather than "spending amount" — same rule, different words. */
+export const MISSING_GULLAK_AMOUNT = 'Please enter an amount before adding this to your gullak.'
 
 /**
  * Starter khatas shown to a brand new account. Each one disappears from the
@@ -65,5 +76,79 @@ export function formatDate(iso) {
     day: '2-digit',
     month: 'short',
     year: 'numeric',
+  })
+}
+
+function isNumberish(token) {
+  return NUMBERISH.test(token) && /\d/.test(token)
+}
+
+/**
+ * Mirrors TransactionService.parse on the backend: works out the amount (with
+ * arithmetic), the note and the khata straight from the entry box, so the UI can
+ * preview the total and warn before anything is sent to the server.
+ *
+ * <p>Pass `{ tags: false }` for destinations with no khatas of their own (the
+ * gullak): any "#word" then stays in the note instead of picking a category.
+ *
+ * Never throws — failures come back as `error` so the caller can render them.
+ */
+export function parseEntry(value, { tags = true, missingAmount = MISSING_AMOUNT } = {}) {
+  const raw = (value ?? '').trim()
+  const category = tags ? tagInInput(raw) : null
+  const result = { amount: 0, note: '', category, hasAmount: false, error: '' }
+
+  if (!raw) {
+    return { ...result, error: missingAmount }
+  }
+
+  const body = tags ? raw.replace(TAG_PATTERN_GLOBAL, ' ') : raw
+  const notes = []
+  const values = []
+  let expression = ''
+
+  const flush = () => {
+    if (!expression) return
+    const candidate = expression
+    expression = ''
+    const cleaned = candidate.replace(/,/g, '').replace(/[+\-*/.,]+$/, '').replace(/^[*/]+/, '')
+    if (!cleaned || !/\d/.test(cleaned)) return
+    values.push(evaluateExpression(cleaned))
+  }
+
+  try {
+    for (const token of body.split(/\s+/).filter(Boolean)) {
+      if (isNumberish(token)) {
+        expression += token
+        continue
+      }
+      if (expression && OPERATORISH.test(token)) {
+        expression += token
+        continue
+      }
+      flush()
+      notes.push(token)
+    }
+    flush()
+  } catch (err) {
+    return { ...result, note: notes.join(' '), error: err.message }
+  }
+
+  const amount = roundMoney(values.reduce((total, part) => total + part, 0))
+
+  return {
+    amount,
+    note: notes.join(' '),
+    category,
+    hasAmount: values.length > 0 && amount > 0,
+    error: values.length > 0 && amount > 0 ? '' : missingAmount,
+  }
+}
+
+/** "1,250.5" — shown next to the entry box while the user types. */
+export function formatAmount(value) {
+  return Number(value).toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
   })
 }

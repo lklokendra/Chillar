@@ -1,0 +1,543 @@
+/* --------------------------------------------------------------- gullak */
+/*
+ * Gullak page styles. Everything is prefixed coin-gullak- and reuses the shared
+ * tokens so it matches the khata/history look: monospace body, black rounded
+ * buttons and light mint (deposit) / rose (withdrawal) washes.
+ */
+
+/* Hero balance ------------------------------------------------------- */
+
+.coin-gullak-hero {
+  position: relative;
+  margin-top: 24px;
+  padding: 28px 24px;
+  border: 1px solid var(--coin-border);
+  border-radius: var(--coin-radius-lg);
+  background: linear-gradient(180deg, var(--coin-mint-soft) 0%, var(--coin-surface) 100%);
+  box-shadow: var(--coin-shadow-sm);
+}
+
+.coin-gullak-hero__label {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--coin-text-muted);
+}
+
+/* The balance is the headline of this page: bigger than anything else. */
+.coin-gullak-hero__value {
+  margin-top: 8px;
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #000;
+}
+
+.coin-gullak-hero__note {
+  margin-top: 6px;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-soft);
+}
+
+/* Small "↑ growing" / "— empty" chip that sits in the card corner. */
+.coin-gullak-hero__flag {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  padding: 5px 12px;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.coin-gullak-hero__flag.is-up {
+  border-color: var(--coin-mint-ink);
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-hero__flag.is-flat {
+  border-color: var(--coin-border-strong);
+  background: var(--coin-surface-soft);
+  color: var(--coin-text-muted);
+}
+
+/* Deposit / withdrawal action buttons -------------------------------- */
+
+/* The two dedicated buttons under the entry box. They share one shape and
+   differ only by hue, so "money in" and "money out" read at a glance. */
+.coin-gullak-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 18px;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  font-family: var(--coin-font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.coin-gullak-action span[aria-hidden] {
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.coin-gullak-action:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.coin-gullak-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.coin-gullak-action--in {
+  border-color: var(--coin-mint-ink);
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-action--in:hover:not(:disabled) {
+  background: var(--coin-mint);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.22);
+}
+
+.coin-gullak-action--out {
+  border-color: var(--coin-rose-ink);
+  background: var(--coin-rose-soft);
+  color: var(--coin-rose-ink);
+}
+
+.coin-gullak-action--out:hover:not(:disabled) {
+  background: var(--coin-rose);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.22);
+}
+
+/* Recent activity ---------------------------------------------------- */
+
+.coin-gullak-recent {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.coin-gullak-recent-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--coin-border);
+  border-left: 4px solid var(--coin-border);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface);
+  transition: border-color 0.15s ease;
+}
+
+.coin-gullak-recent-row.is-in {
+  border-left-color: var(--coin-mint);
+  background: linear-gradient(90deg, var(--coin-mint-soft) 0%, var(--coin-surface) 60%);
+}
+
+.coin-gullak-recent-row.is-out {
+  border-left-color: var(--coin-rose);
+  background: linear-gradient(90deg, var(--coin-rose-soft) 0%, var(--coin-surface) 60%);
+}
+
+.coin-gullak-recent-row:hover {
+  border-color: var(--coin-border-strong);
+}
+
+/* Round + / − badge that carries the direction. */
+.coin-gullak-recent__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  font-family: var(--coin-font-mono);
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.coin-gullak-recent-row.is-in .coin-gullak-recent__icon {
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-recent-row.is-out .coin-gullak-recent__icon {
+  background: var(--coin-rose-soft);
+  color: var(--coin-rose-ink);
+}
+
+.coin-gullak-recent__main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.coin-gullak-recent__note {
+  font-family: var(--coin-font-mono);
+  font-size: 14px;
+  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coin-gullak-recent__meta {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coin-text-muted);
+}
+
+.coin-gullak-recent__amount {
+  margin-left: auto;
+  font-family: var(--coin-font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.coin-gullak-recent__amount.is-in {
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-recent__amount.is-out {
+  color: var(--coin-rose-ink);
+}
+
+.coin-gullak-more {
+  margin-top: 12px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--coin-text-muted);
+}
+
+/* History page ------------------------------------------------------- */
+
+.coin-gullak-back {
+  display: inline-block;
+  margin-top: 20px;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  color: var(--coin-text-soft);
+}
+
+.coin-gullak-back:hover {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Filter + sort controls --------------------------------------------- */
+
+.coin-gullak-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.coin-gullak-filters {
+  display: inline-flex;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--coin-border);
+  border-radius: 9999px;
+  background: #fafafa;
+}
+
+.coin-gullak-filters__btn {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: #666;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-gullak-filters__btn:hover {
+  color: #000;
+}
+
+.coin-gullak-filters__btn.is-active {
+  background: #000;
+  color: #fff;
+}
+
+/* Transaction list --------------------------------------------------- */
+
+.coin-gullak-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.coin-gullak-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--coin-border);
+  border-left: 4px solid var(--coin-border);
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface);
+  transition: border-color 0.15s ease;
+}
+
+.coin-gullak-row:hover {
+  border-color: var(--coin-border-strong);
+}
+
+.coin-gullak-row--in {
+  border-left-color: var(--coin-mint);
+}
+
+.coin-gullak-row--out {
+  border-left-color: var(--coin-rose);
+}
+
+/* Same round + / − badge as the dashboard rows. */
+.coin-gullak-row__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  font-family: var(--coin-font-mono);
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.coin-gullak-row--in .coin-gullak-row__icon {
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-row--out .coin-gullak-row__icon {
+  background: var(--coin-rose-soft);
+  color: var(--coin-rose-ink);
+}
+
+.coin-gullak-row__main {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.coin-gullak-row__note {
+  font-family: var(--coin-font-mono);
+  font-size: 14px;
+  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.coin-gullak-row__meta {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coin-text-muted);
+}
+
+.coin-gullak-row__side {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.coin-gullak-row__amount {
+  font-family: var(--coin-font-mono);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.coin-gullak-row__amount.is-in {
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-row__amount.is-out {
+  color: var(--coin-rose-ink);
+}
+
+.coin-gullak-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Deposit / withdrawal pill toggle (edit form) ----------------------- */
+
+.coin-gullak-toggle {
+  display: inline-flex;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--coin-border);
+  border-radius: 9999px;
+  background: #fafafa;
+}
+
+.coin-gullak-toggle__btn {
+  padding: 7px 18px;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  background: transparent;
+  color: #666;
+  font-family: var(--coin-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.coin-gullak-toggle__btn:hover {
+  color: #000;
+}
+
+.coin-gullak-toggle__btn.is-active.coin-gullak-toggle__btn--deposit {
+  border-color: var(--coin-mint-ink);
+  background: var(--coin-mint-soft);
+  color: var(--coin-mint-ink);
+}
+
+.coin-gullak-toggle__btn.is-active.coin-gullak-toggle__btn--withdrawal {
+  border-color: var(--coin-rose-ink);
+  background: var(--coin-rose-soft);
+  color: var(--coin-rose-ink);
+}
+
+/* Inline edit form replaces a row when editing. */
+.coin-gullak-edit {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #000;
+  border-radius: var(--coin-radius);
+  background: var(--coin-surface-soft);
+}
+
+.coin-gullak-edit__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Amount / date / note inputs share one look. */
+.coin-gullak-form__row {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.coin-gullak-form__label {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #000;
+  opacity: 0.5;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.coin-gullak-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fcfcfc;
+  color: #000;
+  font-family: var(--coin-font-mono);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.coin-gullak-input:focus {
+  outline: none;
+  border-color: #000;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Responsive --------------------------------------------------------- */
+
+@media (max-width: 560px) {
+  .coin-gullak-hero__value {
+    font-size: 38px;
+  }
+
+  .coin-gullak-hero__flag {
+    top: 18px;
+    right: 18px;
+  }
+
+  .coin-gullak-action {
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .coin-gullak-hero__value {
+    font-size: 34px;
+  }
+
+  .coin-gullak-hero__flag {
+    position: static;
+    display: inline-block;
+    margin-top: 12px;
+  }
+
+  .coin-gullak-form__row {
+    grid-template-columns: 1fr;
+  }
+
+  .coin-gullak-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .coin-gullak-row__side {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .coin-gullak-recent-row {
+    gap: 10px;
+    padding: 12px;
+  }
+}

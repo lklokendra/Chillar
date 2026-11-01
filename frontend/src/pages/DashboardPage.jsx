@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Button from '../components/Button'
-import Brand from '../components/Brand'
+import EntryBox from '../components/EntryBox'
 import KhataAccordion from '../components/KhataAccordion'
+import TopBar from '../components/TopBar'
 import { useAuth } from '../context/AuthContext'
 import * as transactionApi from '../api/transactions'
 import { errorMessage } from '../api/client'
 import {
   buildSuggestions,
   formatDate,
+  MISSING_AMOUNT,
+  parseEntry,
   tagInInput,
   todayIso,
   withTag,
@@ -17,7 +19,7 @@ import {
 
 export default function DashboardPage() {
   const navigate = useNavigate()
-  const { user, isGuest, signOut } = useAuth()
+  const { user, isGuest } = useAuth()
   const [khatas, setKhatas] = useState([])
   const [transactions, setTransactions] = useState([])
   const [entryInput, setEntryInput] = useState('')
@@ -25,6 +27,7 @@ export default function DashboardPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [entryWarning, setEntryWarning] = useState('')
   const [deletingId, setDeletingId] = useState(null)
   const [expandedKhata, setExpandedKhata] = useState(null)
   const inputRef = useRef(null)
@@ -36,6 +39,8 @@ export default function DashboardPage() {
   const entryCount = transactions.length
   const activeTag = tagInInput(entryInput)
   const suggestions = buildSuggestions(spendKhatas)
+  // What the entry box currently adds up to — shown before anything is saved.
+  const preview = parseEntry(entryInput)
 
   const entriesByKhata = {}
   for (const transaction of transactions) {
@@ -66,9 +71,17 @@ export default function DashboardPage() {
     const value = entryInput.trim()
     if (!value || saving) return
 
+    // Warn instead of sending an entry that adds up to nothing.
+    if (!preview.hasAmount) {
+      setEntryWarning(preview.error || MISSING_AMOUNT)
+      inputRef.current?.focus()
+      return
+    }
+
     setSaving(true)
     setError('')
     setNotice('')
+    setEntryWarning('')
     try {
       const saved = await transactionApi.addEntry(value, entryDate)
       setEntryInput('')
@@ -122,12 +135,7 @@ export default function DashboardPage() {
 
   return (
     <div className="coin-page">
-      <header className="coin-topbar" style={{ padding: '14px 0', border: 'none', justifyContent: 'space-between' }}>
-        <Brand showTag={false} />
-        <Button variant="ghost" size="sm" onClick={signOut}>
-          Sign out
-        </Button>
-      </header>
+      <TopBar />
 
       <div style={{ marginTop: '20px' }}>
         <h1 className="coin-page__title">hi {firstName}</h1>
@@ -156,31 +164,36 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Prominent one-line entry — no add button, just type and hit enter. */}
-        <div className="coin-entry-card">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '32px', fontWeight: '900' }}>₹</span>
-            <input
-              ref={inputRef}
-              className="coin-entry-input"
-              placeholder="100 chai #office"
-              value={entryInput}
-              onChange={(e) => setEntryInput(e.target.value)}
-              onKeyDown={handleEntrySubmit}
-              disabled={saving}
-            />
-          </div>
-
-          <div className="coin-entry-meta">
-            <label className="coin-entry-date">
-              <span>date</span>
-              <input type="date" value={entryDate} onChange={(e) => setEntryDate(e.target.value)} />
-            </label>
-            <p className="coin-entry-hint">
-              numbers → money · words → note · #tag → category · press enter to log
-            </p>
-          </div>
-        </div>
+        {/* Prominent one-line entry — type, then hit enter or the + button. */}
+        <EntryBox
+          value={entryInput}
+          onChange={(event) => {
+            setEntryInput(event.target.value)
+            if (entryWarning) setEntryWarning('')
+          }}
+          onKeyDown={handleEntrySubmit}
+          inputRef={inputRef}
+          placeholder="100 chai #office"
+          hint="numbers → money · words → note · #tag → category · press enter or + to log"
+          date={entryDate}
+          onDateChange={(event) => setEntryDate(event.target.value)}
+          preview={preview}
+          warning={entryWarning}
+          disabled={saving}
+          ariaLabel="Add an expense"
+          inlineActions={
+            <button
+              type="button"
+              className="coin-add-btn"
+              onClick={submitEntry}
+              disabled={saving || !preview.hasAmount}
+              aria-label="Add expense"
+              title="Add expense"
+            >
+              +
+            </button>
+          }
+        />
 
         {notice && (
           <div className="coin-alert coin-alert--ok" role="status" style={{ marginTop: '12px' }}>
