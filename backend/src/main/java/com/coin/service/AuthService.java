@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +37,10 @@ import com.coin.security.JwtService;
 public class AuthService {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    /** Same wording for a known and an unknown address, so neither can be probed. */
+    private static final String GENERIC_RESET_MESSAGE =
+            "If an account exists with this email, password reset instructions will be sent.";
 
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository resetTokenRepository;
@@ -73,11 +78,12 @@ public class AuthService {
         user.setRole(Role.USER);
         userRepository.save(user);
 
-        return issueToken(user);
+        return issueToken(user, false);
     }
 
     public AuthResponse login(LoginRequest request) {
         String email = normalizeEmail(request.email());
+        boolean rememberMe = Boolean.TRUE.equals(request.rememberMe());
 
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.password()));
@@ -88,7 +94,7 @@ public class AuthService {
         User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ApiException(HttpStatus.UNAUTHORIZED, "Incorrect email or password"));
 
-        return issueToken(user);
+        return issueToken(user, rememberMe);
     }
 
     /**
@@ -99,12 +105,12 @@ public class AuthService {
     public AuthResponse guest() {
         User user = new User();
         user.setName("Guest");
-        user.setEmail("guest-" + UUID.randomUUID() + "@chillar.local");
+        user.setEmail("guest-" + UUID.randomUUID() + "@paise.local");
         user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
         user.setRole(Role.USER);
         userRepository.save(user);
 
-        return issueToken(user);
+        return issueToken(user, false);
     }
 
     @Transactional(readOnly = true)
@@ -115,14 +121,23 @@ public class AuthService {
     }
 
     /**
-     * Issues a single-use reset token. Chillar has no mail transport yet, so the
-     * token travels back to the client and the UI renders the link on screen.
+     * Issues a single-use reset token.
+     *
+     * <p>An unknown address is answered exactly like a known one so the endpoint
+     * cannot be used to discover who has an account. Paise has no mail transport
+     * yet, so when the account does exist the token travels back to the client
+     * and the UI renders the link on screen.</p>
      */
     @Transactional
     public ForgotPasswordResponse forgotPassword(ForgotPasswordRequest request) {
         String email = normalizeEmail(request.email());
-        User user = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "No Chillar account uses that email"));
+        Optional<User> maybeUser = userRepository.findByEmailIgnoreCase(email);
+
+        if (maybeUser.isEmpty()) {
+            return new ForgotPasswordResponse(GENERIC_RESET_MESSAGE, null, resetExpirationMinutes);
+        }
+
+        User user = maybeUser.get();
 
         // Any earlier link stops working the moment a new one is asked for.
         resetTokenRepository.deleteByUser(user);
@@ -133,10 +148,7 @@ public class AuthService {
         reset.setExpiresAt(Instant.now().plus(resetExpirationMinutes, ChronoUnit.MINUTES));
         resetTokenRepository.save(reset);
 
-        return new ForgotPasswordResponse(
-                "Reset link ready. It expires in " + resetExpirationMinutes + " minutes.",
-                reset.getToken(),
-                resetExpirationMinutes);
+        return new ForgotPasswordResponse(GENERIC_RESET_MESSAGE, reset.getToken(), resetExpirationMinutes);
     }
 
     @Transactional
@@ -155,7 +167,7 @@ public class AuthService {
         reset.setUsedAt(Instant.now());
         resetTokenRepository.save(reset);
 
-        return new MessageResponse("Password updated. You can sign in now.");
+        return new MessageResponse("Password changed successfully. You can sign in now.");
     }
 
     private String generateResetToken() {
@@ -164,9 +176,10 @@ public class AuthService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    private AuthResponse issueToken(User user) {
-        String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
-        return AuthResponse.bearer(token, jwtService.getExpirationMinutes(), toResponse(user));
+    private AuthResponse issueToken(User user, boolean rememberMe) {
+        long lifetime = jwtService.lifetimeMinutes(rememberMe);
+        String token = jwtService.generateToken(user.getEmail(), user.getRole().name(), rememberMe);
+        return AuthResponse.bearer(token, lifetime, toResponse(user));
     }
 
     private UserResponse toResponse(User user) {

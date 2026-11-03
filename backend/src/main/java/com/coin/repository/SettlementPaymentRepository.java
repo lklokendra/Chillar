@@ -1,5 +1,7 @@
 package com.coin.repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +17,9 @@ public interface SettlementPaymentRepository extends JpaRepository<SettlementPay
     List<SettlementPayment> findBySettlementOrderByPaidAtAscCreatedAtAsc(SplitSettlement settlement);
 
     Optional<SettlementPayment> findByIdAndSettlement(Long id, SplitSettlement settlement);
+
+    // Stops the same instalment being submitted twice (double-click, retry).
+    boolean existsBySettlementAndAmountAndPaidAt(SplitSettlement settlement, BigDecimal amount, LocalDate paidAt);
 
     // One query for a whole group's settlements, so the dashboard never fires a
     // query per settlement.

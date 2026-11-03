@@ -172,7 +172,7 @@ export default function GullakHistoryPage() {
         ← back to gullak
       </Link>
 
-      <h1 className="coin-page__title">gullak history</h1>
+      <h1 className="coin-page__title">Gullak History</h1>
       <p className="coin-page__subtitle">
         every deposit and withdrawal — {count} {count === 1 ? 'entry' : 'entries'} on record.
       </p>

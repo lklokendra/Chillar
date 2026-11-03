@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>com.coin</groupId>
-    <artifactId>chillar-backend</artifactId>
+    <artifactId>paise-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>chillar-backend</name>
-    <description>Chillar - personal finance tracker REST API</description>
+    <name>paise-backend</name>
+    <description>Paise - personal finance tracker REST API</description>
 
     <properties>
         <java.version>21</java.version>

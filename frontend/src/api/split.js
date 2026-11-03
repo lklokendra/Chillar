@@ -14,6 +14,8 @@ export const deleteExpense = (groupId, expenseId) => api.delete(`/split/groups/$
 
 export const listSettlements = (groupId) => api.get(`/split/groups/${groupId}/settlements`).then((res) => res.data)
 export const recordSettlement = (groupId, payload) => api.post(`/split/groups/${groupId}/settlements`, payload).then((res) => res.data)
+export const updateSettlement = (groupId, settlementId, payload) =>
+  api.put(`/split/groups/${groupId}/settlements/${settlementId}`, payload).then((res) => res.data)
 export const deleteSettlement = (groupId, settlementId) => api.delete(`/split/groups/${groupId}/settlements/${settlementId}`).then((res) => res.data)
 export const recordPayment = (groupId, settlementId, payload) =>
   api.post(`/split/groups/${groupId}/settlements/${settlementId}/payments`, payload).then((res) => res.data)

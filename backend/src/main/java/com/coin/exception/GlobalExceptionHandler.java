@@ -1,5 +1,8 @@
 package com.coin.exception;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -19,10 +22,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex) {
-        FieldError fieldError = ex.getBindingResult().getFieldError();
-        String message = fieldError != null ? fieldError.getDefaultMessage() : "Request validation failed";
+        // One message per offending field, so the UI can show each error in place.
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            fieldErrors.putIfAbsent(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+
+        FieldError first = ex.getBindingResult().getFieldError();
+        String message = first != null ? first.getDefaultMessage() : "Request validation failed";
         return ResponseEntity.badRequest()
-                .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Bad Request", message));
+                .body(new ApiError(HttpStatus.BAD_REQUEST.value(), "Bad Request", message, fieldErrors));
     }
 
     @ExceptionHandler(AuthenticationException.class)

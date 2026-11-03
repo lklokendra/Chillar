@@ -247,8 +247,9 @@ public class SplitService {
         }
 
         List<SplitSettlementResponse> responses = new ArrayList<>();
-        BigDecimal totalOwed = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal loggedAmount = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
         BigDecimal totalReceived = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalPending = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
         int completed = 0;
         int partial = 0;
         int pending = 0;
@@ -263,8 +264,11 @@ public class SplitService {
             BigDecimal remaining = record.getAmount().subtract(paid).setScale(2, RoundingMode.HALF_UP);
 
             responses.add(toSettlementResponse(record, payments, paid, remaining));
-            totalOwed = totalOwed.add(record.getAmount());
+            loggedAmount = loggedAmount.add(record.getAmount());
             totalReceived = totalReceived.add(paid);
+            // Only the unpaid remainder counts as pending: a record nobody has paid
+            // yet is an intention, and a part-paid one has already moved real money.
+            totalPending = totalPending.add(remaining);
 
             if (SplitSettlement.STATUS_PAID.equals(record.getStatus())) {
                 completed++;
@@ -275,7 +279,8 @@ public class SplitService {
             }
         }
 
-        return new SettlementBundle(responses, totalOwed, totalReceived, completed, partial, pending);
+        return new SettlementBundle(responses, loggedAmount, totalReceived, totalPending,
+                completed, partial, pending);
     }
 
     @Transactional(readOnly = true)
@@ -328,15 +333,70 @@ public class SplitService {
     }
 
     /**
+     * Edits a recorded settlement and re-derives its status. The amount can never
+     * be pulled below what has already been paid, otherwise the instalments would
+     * exceed the record and the paid/remaining pair would stop making sense.
+     */
+    @Transactional
+    public SplitSettlementResponse updateSettlement(User user, Long groupId, Long settlementId,
+                                                    SettlementRequest request) {
+        SplitGroup group = requireGroup(user, groupId);
+        SplitSettlement settlement = requireSettlement(group, settlementId);
+
+        if (request.payerId() != null && request.payerId().equals(request.receiverId())) {
+            throw new IllegalArgumentException("The payer and the receiver must be different people");
+        }
+        SplitParticipant payer = resolvePayer(group, request.payerId());
+        SplitParticipant receiver = resolvePayer(group, request.receiverId());
+        BigDecimal amount = requirePositiveAmount(request.amount()).setScale(2, RoundingMode.HALF_UP);
+        LocalDate date = request.date() == null ? LocalDate.now() : request.date();
+
+        BigDecimal paid = paidOf(settlement);
+        if (amount.compareTo(paid) < 0) {
+            throw new ApiException(HttpStatus.BAD_REQUEST,
+                    "₹" + paid.toPlainString() + " has already been paid against this settlement");
+        }
+
+        // Editing must not create a second copy of a hand-over already on record.
+        boolean duplicate = splitSettlementRepository.findByGroupWithParticipants(group).stream()
+                .anyMatch(other -> !other.getId().equals(settlement.getId())
+                        && other.getPayer().getId().equals(payer.getId())
+                        && other.getReceiver().getId().equals(receiver.getId())
+                        && other.getAmount().compareTo(amount) == 0
+                        && other.getDate().equals(date));
+        if (duplicate) {
+            throw new ApiException(HttpStatus.CONFLICT,
+                    "An identical settlement between these two on that date already exists");
+        }
+
+        settlement.setPayer(payer);
+        settlement.setReceiver(receiver);
+        settlement.setAmount(amount);
+        settlement.setDate(date);
+        settlement.setNote(trimToNull(request.note()));
+
+        audit(group, settlement.getId(), "SETTLEMENT_UPDATED",
+                payer.getName() + " → " + receiver.getName() + " · ₹" + amount.toPlainString()
+                        + " record edited");
+
+        return refreshSettlement(group, settlement);
+    }
+
+    /**
      * Records an instalment. An omitted amount pays the whole outstanding
      * remainder; anything larger than the remainder is rejected, so a settlement
      * can never be overpaid.
+     *
+     * <p>The settlement row is locked for the duration, so two instalments sent at
+     * the same moment are serialised and cannot both slip past the overpayment
+     * check. Re-sending an identical instalment is rejected outright.</p>
      */
     @Transactional
     public SplitSettlementResponse recordPayment(User user, Long groupId, Long settlementId,
                                                  SettlementPaymentRequest request) {
         SplitGroup group = requireGroup(user, groupId);
-        SplitSettlement settlement = requireSettlement(group, settlementId);
+        SplitSettlement settlement = splitSettlementRepository.findByIdAndGroupForUpdate(settlementId, group)
+                .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "That settlement no longer exists"));
 
         BigDecimal alreadyPaid = paidOf(settlement);
         BigDecimal remaining = settlement.getAmount().subtract(alreadyPaid).setScale(2, RoundingMode.HALF_UP);
@@ -355,10 +415,16 @@ public class SplitService {
                     "Only ₹" + remaining.toPlainString() + " is still pending on this settlement");
         }
 
+        LocalDate paidAt = request.paidAt() == null ? LocalDate.now() : request.paidAt();
+        if (settlementPaymentRepository.existsBySettlementAndAmountAndPaidAt(settlement, amount, paidAt)) {
+            throw new ApiException(HttpStatus.CONFLICT,
+                    "That payment has already been recorded on this settlement");
+        }
+
         SettlementPayment payment = new SettlementPayment();
         payment.setSettlement(settlement);
         payment.setAmount(amount);
-        payment.setPaidAt(request.paidAt() == null ? LocalDate.now() : request.paidAt());
+        payment.setPaidAt(paidAt);
         payment.setNote(trimToNull(request.note()));
         settlementPaymentRepository.save(payment);
 
@@ -469,11 +535,23 @@ public class SplitService {
      * Recomputes the whole dashboard from stored rows: totals, per-participant
      * fair shares, balances and the minimum settlement transfers. Everything is
      * done in integer paise so the numbers reconcile exactly.
+     *
+     * <p>The balances are net of everything that really happened: the expenses
+     * each participant paid, their equal fair share, and the money that has
+     * actually moved through completed settlement instalments. A record that is
+     * merely logged as pending moves nothing.</p>
      */
     private SplitGroupDetailResponse buildDetail(SplitGroup group) {
         List<SplitParticipant> participants = splitParticipantRepository.findByGroupOrderByCreatedAtAsc(group);
         List<SplitExpense> expenses = splitExpenseRepository.findByGroupWithParticipant(group);
         BigDecimal totalExpense = splitExpenseRepository.sumAmountByGroup(group).setScale(2, RoundingMode.HALF_UP);
+
+        // The settlements have to be read before the balances are built: every
+        // completed instalment is real money moving between two participants and
+        // is therefore part of their net balance.
+        SettlementBundle bundle = loadSettlements(group);
+        SettlementFlows flows = settlementFlows(bundle.records());
+
         int count = participants.size();
 
         // Equal fair share allocated at paise level: divide the total into whole
@@ -496,17 +574,33 @@ public class SplitService {
 
         List<ParticipantSummaryResponse> summary = new ArrayList<>();
         List<Balance> balances = new ArrayList<>();
+        // The gross obligation the expenses alone create, before any settlement.
+        long grossOwedPaise = 0;
         for (int i = 0; i < count; i++) {
             SplitParticipant participant = participants.get(i);
             long paid = paidPaise.getOrDefault(participant.getId(), 0L);
             long fairShare = basePaise + (i < remainder ? 1 : 0);
-            long net = paid - fairShare;
+
+            // What the expenses alone say this participant is owed or owes.
+            long expenseNet = paid - fairShare;
+            long settledOut = flows.paidOut().getOrDefault(participant.getId(), 0L);
+            long settledIn = flows.received().getOrDefault(participant.getId(), 0L);
+
+            // Net Balance = Paid - Fair Share - Settlements Paid + Settlements Received.
+            long net = expenseNet + settledOut - settledIn;
+
+            if (expenseNet > 0) {
+                grossOwedPaise += expenseNet;
+            }
+
             balances.add(new Balance(participant.getId(), participant.getName(), net));
             summary.add(new ParticipantSummaryResponse(
                     participant.getId(),
                     participant.getName(),
                     toRupees(paid),
                     toRupees(fairShare),
+                    toRupees(settledOut),
+                    toRupees(settledIn),
                     toRupees(net)));
         }
 
@@ -520,17 +614,21 @@ public class SplitService {
 
         List<SettlementInstructionResponse> instructions = settle(balances);
 
-        // The suggested instructions are the live view; the recorded settlements
-        // are what actually happened. Both are returned, never merged.
+        // The suggestions are derived from the balances above, so they shrink by
+        // exactly what has already been handed over.
         long suggestedPaise = instructions.stream()
                 .mapToLong(instruction -> instruction.amount().movePointRight(2).longValueExact())
                 .sum();
 
-        SettlementBundle bundle = loadSettlements(group);
+        // Four independent notions, each from its own source records:
+        //   totalOwed            - gross debt the expenses create (never reduced)
+        //   totalReceived        - money actually received through instalments
+        //   totalPending         - the unpaid remainder of the logged records
+        //   suggestedOutstanding - what the current balances still say to move
         SettlementDashboardResponse dashboard = new SettlementDashboardResponse(
-                bundle.totalOwed(),
+                toRupees(grossOwedPaise),
                 bundle.totalReceived(),
-                bundle.totalOwed().subtract(bundle.totalReceived()).setScale(2, RoundingMode.HALF_UP),
+                bundle.totalPending(),
                 toRupees(suggestedPaise),
                 bundle.records().size(),
                 bundle.completedCount(),
@@ -560,18 +658,40 @@ public class SplitService {
     }
 
     /**
+     * Folds every completed instalment into the direction it moved: the payer
+     * handed money over (so owes less), the receiver took it in (so is owed
+     * less). Done in integer paise so the two sides cancel exactly.
+     */
+    private SettlementFlows settlementFlows(List<SplitSettlementResponse> records) {
+        Map<Long, Long> paidOut = new HashMap<>();
+        Map<Long, Long> received = new HashMap<>();
+        for (SplitSettlementResponse record : records) {
+            for (SettlementPaymentResponse payment : record.payments()) {
+                long paise = payment.amount().movePointRight(2).longValueExact();
+                paidOut.merge(record.payerId(), paise, Long::sum);
+                received.merge(record.receiverId(), paise, Long::sum);
+            }
+        }
+        return new SettlementFlows(paidOut, received);
+    }
+
+    /**
      * Greedy debt settlement: repeatedly match the biggest debtor with the
      * biggest creditor and move the smaller of the two amounts. Because every
      * amount is integer paise the transfers sum exactly to the outstanding debt.
+     *
+     * <p>Both sides are ordered by amount and then by participant id, so equal
+     * balances always produce the same suggestions instead of shuffling on every
+     * refresh.
      */
     private List<SettlementInstructionResponse> settle(List<Balance> balances) {
         List<Balance> creditors = balances.stream()
                 .filter(b -> b.net() > 0)
-                .sorted(Comparator.comparingLong(Balance::net).reversed())
+                .sorted(Comparator.comparingLong(Balance::net).reversed().thenComparing(Balance::id))
                 .toList();
         List<Balance> debtors = balances.stream()
                 .filter(b -> b.net() < 0)
-                .sorted(Comparator.comparingLong(Balance::net))
+                .sorted(Comparator.comparingLong(Balance::net).thenComparing(Balance::id))
                 .toList();
 
         long[] creditorRemaining = creditors.stream().mapToLong(Balance::net).toArray();
@@ -703,11 +823,28 @@ public class SplitService {
     private record Balance(Long id, String name, long net) {
     }
 
-    /** The records plus their roll-up, computed in a single pass. */
+    /**
+     * Money that has actually changed hands through completed instalments, split
+     * by direction so a participant row can show both sides.
+     */
+    private record SettlementFlows(Map<Long, Long> paidOut, Map<Long, Long> received) {
+
+        /** Paid out minus received: the amount this participant's net balance moves by. */
+        long net(Long participantId) {
+            return paidOut.getOrDefault(participantId, 0L) - received.getOrDefault(participantId, 0L);
+        }
+    }
+
+    /**
+     * The records plus their roll-up, computed in a single pass. Everything here
+     * describes the settlement records themselves; the expense-derived debt lives
+     * in {@link #buildDetail} because it is recomputed from the ledgers.
+     */
     private record SettlementBundle(
             List<SplitSettlementResponse> records,
-            BigDecimal totalOwed,
+            BigDecimal loggedAmount,
             BigDecimal totalReceived,
+            BigDecimal totalPending,
             int completedCount,
             int partialCount,
             int pendingCount) {

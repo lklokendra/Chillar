@@ -1,5 +1,5 @@
 /*
- * Chillar design tokens.
+ * Paise design tokens.
  * One place to change the whole look: minimal white canvas, vibrant accents.
  * Every accent exposes three values: the hue, a soft background, and a dark ink
  * used for text + borders (that pair is what the small buttons are built from).
@@ -73,7 +73,7 @@
   --coin-rose-soft: #fff1f2;
   --coin-rose-ink: #9f1239;
 
-  /* Accent - blue (khata cards, tiles) */
+  /* Accent - blue (kharch cards, tiles) */
   --coin-blue: #2563eb;
   --coin-blue-soft: #eff6ff;
   --coin-blue-line: #d3e4fb;
@@ -81,7 +81,7 @@
   --coin-blue-line-2: #c3e0f5;
   --coin-blue-ink: #14568c;
 
-  /* Khata washes: a roomy pastel card per badge colour */
+  /* Kharch washes: a roomy pastel card per badge colour */
   --coin-mint-card: #f2fbf9;
   --coin-mint-card-line: #d6efe9;
   --coin-amber-card: #fffdf3;
@@ -211,7 +211,7 @@
   --coin-blue-line-2: rgba(96, 165, 250, 0.32);
   --coin-blue-ink: #93c5fd;
 
-  /* Khata washes */
+  /* Kharch washes */
   --coin-mint-card: rgba(45, 212, 191, 0.08);
   --coin-mint-card-line: rgba(45, 212, 191, 0.28);
   --coin-amber-card: rgba(251, 191, 36, 0.08);

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 
 /** Where the choice lives, so it survives a refresh. */
-const STORAGE_KEY = 'chillar.theme'
+const STORAGE_KEY = 'paise.theme'
 
 /** The three options offered in the nav, in the order the toggle lists them. */
 export const THEME_MODES = ['light', 'dark', 'system']

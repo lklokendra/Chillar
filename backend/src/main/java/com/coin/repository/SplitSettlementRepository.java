@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.coin.entity.SplitGroup;
 import com.coin.entity.SplitParticipant;
 import com.coin.entity.SplitSettlement;
+
+import jakarta.persistence.LockModeType;
 
 public interface SplitSettlementRepository extends JpaRepository<SplitSettlement, Long> {
 
@@ -22,6 +25,15 @@ public interface SplitSettlementRepository extends JpaRepository<SplitSettlement
     List<SplitSettlement> findByGroupWithParticipants(@Param("group") SplitGroup group);
 
     Optional<SplitSettlement> findByIdAndGroup(Long id, SplitGroup group);
+
+    /**
+     * Same lookup as {@link #findByIdAndGroup}, but takes a row lock. Recording an
+     * instalment has to read the paid-so-far total and then write, so without the
+     * lock two simultaneous submissions could both pass the overpayment check.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT s FROM SplitSettlement s WHERE s.id = :id AND s.group = :group")
+    Optional<SplitSettlement> findByIdAndGroupForUpdate(@Param("id") Long id, @Param("group") SplitGroup group);
 
     long countByGroup(SplitGroup group);
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import KhataAccordion from '../components/KhataAccordion'
+import KharchAccordion from '../components/KharchAccordion'
 import TopBar from '../components/TopBar'
 import { useAuth } from '../context/AuthContext'
 import * as transactionApi from '../api/transactions'
@@ -13,7 +13,7 @@ const SORT_OPTIONS = [
   { value: 'amount-asc', label: '₹ low', aria: 'Amount low to high' },
 ]
 
-/** Client-side ordering of the already-loaded entries for one khata. */
+/** Client-side ordering of the already-loaded entries for one kharch. */
 function sortEntries(entries, sortBy) {
   const list = [...entries]
   switch (sortBy) {
@@ -31,10 +31,10 @@ function sortEntries(entries, sortBy) {
 
 export default function HistoryPage() {
   const { isGuest } = useAuth()
-  const [khatas, setKhatas] = useState([])
+  const [kharch, setKharch] = useState([])
   const [transactions, setTransactions] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [expandedKhata, setExpandedKhata] = useState(null)
+  const [expandedKharch, setExpandedKharch] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
   const [addingTo, setAddingTo] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -42,8 +42,8 @@ export default function HistoryPage() {
   const [notice, setNotice] = useState('')
   const [sortBy, setSortBy] = useState('newest')
 
-  const spendKhatas = khatas.filter((k) => k.name !== 'all')
-  const totalAll = Number(khatas.find((k) => k.name === 'all')?.total ?? 0)
+  const spendKharch = kharch.filter((k) => k.name !== 'all')
+  const totalAll = Number(kharch.find((k) => k.name === 'all')?.total ?? 0)
 
   const query = searchQuery.trim().toLowerCase()
   const matchesQuery = (t) =>
@@ -52,17 +52,17 @@ export default function HistoryPage() {
       (field) => field && field.toLowerCase().includes(query),
     )
 
-  const entriesByKhata = {}
+  const entriesByKharch = {}
   for (const transaction of transactions) {
-    if (!entriesByKhata[transaction.categoryName]) {
-      entriesByKhata[transaction.categoryName] = []
+    if (!entriesByKharch[transaction.categoryName]) {
+      entriesByKharch[transaction.categoryName] = []
     }
-    entriesByKhata[transaction.categoryName].push(transaction)
+    entriesByKharch[transaction.categoryName].push(transaction)
   }
 
-  const entriesFor = (name) => sortEntries((entriesByKhata[name] ?? []).filter(matchesQuery), sortBy)
-  // While searching, only khatas with hits stay on screen.
-  const listedKhatas = query ? spendKhatas.filter((k) => entriesFor(k.name).length > 0) : spendKhatas
+  const entriesFor = (name) => sortEntries((entriesByKharch[name] ?? []).filter(matchesQuery), sortBy)
+  // While searching, only kharch with hits stay on screen.
+  const listedKharch = query ? spendKharch.filter((k) => entriesFor(k.name).length > 0) : spendKharch
 
   useEffect(() => {
     load()
@@ -71,11 +71,11 @@ export default function HistoryPage() {
   async function load() {
     setLoading(true)
     try {
-      const [khataData, transactionData] = await Promise.all([
-        transactionApi.getKhatas(),
+      const [kharchData, transactionData] = await Promise.all([
+        transactionApi.getKharch(),
         transactionApi.getTransactions(),
       ])
-      setKhatas(khataData)
+      setKharch(kharchData)
       setTransactions(transactionData)
     } catch (err) {
       setError(errorMessage(err))
@@ -84,8 +84,8 @@ export default function HistoryPage() {
     }
   }
 
-  function toggleKhata(name) {
-    setExpandedKhata((current) => (current === name ? null : name))
+  function toggleKharch(name) {
+    setExpandedKharch((current) => (current === name ? null : name))
   }
 
   async function handleDelete(transaction) {
@@ -108,7 +108,7 @@ export default function HistoryPage() {
     }
   }
 
-  /** Adds an entry straight into this khata, keeping the dropdown open. */
+  /** Adds an entry straight into this kharch, keeping the dropdown open. */
   async function handleAdd(categoryName, text) {
     setAddingTo(categoryName)
     setError('')
@@ -131,9 +131,9 @@ export default function HistoryPage() {
       <TopBar />
 
       <div className="coin-history-page" style={{ marginTop: '20px' }}>
-        <h1 className="coin-page__title">history</h1>
+        <h1 className="coin-page__title">History</h1>
         <p className="coin-page__subtitle" style={{ marginBottom: '32px' }}>
-          every khata, every entry — ₹ {totalAll.toLocaleString()} logged
+          every kharch, every entry — ₹ {totalAll.toLocaleString()} logged
           {isGuest ? ' as a guest' : ''}.
         </p>
 
@@ -142,13 +142,13 @@ export default function HistoryPage() {
             <div className="coin-tile coin-tile--ink">
               <div className="coin-tile__label">total logged</div>
               <div className="coin-tile__value">₹ {totalAll.toLocaleString()}</div>
-              <div className="coin-tile__note">across every khata</div>
+              <div className="coin-tile__note">across every kharch</div>
             </div>
             <div className="coin-tile coin-tile--mint">
-              <div className="coin-tile__label">khatas</div>
-              <div className="coin-tile__value">{spendKhatas.length}</div>
+              <div className="coin-tile__label">kharch</div>
+              <div className="coin-tile__value">{spendKharch.length}</div>
               <div className="coin-tile__note">
-                {spendKhatas.length === 1 ? 'active category' : 'active categories'}
+                {spendKharch.length === 1 ? 'active category' : 'active categories'}
               </div>
             </div>
             <div className="coin-tile coin-tile--blue">
@@ -214,24 +214,24 @@ export default function HistoryPage() {
               <span className="coin-history-empty__glyph" aria-hidden="true">
                 ◔
               </span>
-              <p className="coin-history-empty__title">Loading your khatas…</p>
+              <p className="coin-history-empty__title">Loading your kharch…</p>
               <p className="coin-history-empty__text">Gathering every entry, one moment.</p>
             </div>
           )}
 
-          {!loading && spendKhatas.length === 0 && (
+          {!loading && spendKharch.length === 0 && (
             <div className="coin-history-empty">
               <span className="coin-history-empty__glyph" aria-hidden="true">
                 ✎
               </span>
-              <p className="coin-history-empty__title">No khatas yet</p>
+              <p className="coin-history-empty__title">No kharch yet</p>
               <p className="coin-history-empty__text">
                 Log something like “100 chai #food” and it will show up here.
               </p>
             </div>
           )}
 
-          {!loading && spendKhatas.length > 0 && listedKhatas.length === 0 && (
+          {!loading && spendKharch.length > 0 && listedKharch.length === 0 && (
             <div className="coin-history-empty">
               <span className="coin-history-empty__glyph" aria-hidden="true">
                 ⌕
@@ -250,19 +250,19 @@ export default function HistoryPage() {
             </div>
           )}
 
-          {listedKhatas.map((khata) => {
-            const entries = entriesFor(khata.name)
+          {listedKharch.map((kharch) => {
+            const entries = entriesFor(kharch.name)
             return (
-              <KhataAccordion
-                key={khata.name}
-                khata={khata}
+              <KharchAccordion
+                key={kharch.name}
+                kharch={kharch}
                 entries={entries}
-                isOpen={expandedKhata === khata.name || Boolean(query && entries.length > 0)}
-                onToggle={toggleKhata}
+                isOpen={expandedKharch === kharch.name || Boolean(query && entries.length > 0)}
+                onToggle={toggleKharch}
                 deletingId={deletingId}
                 onDelete={handleDelete}
                 onAdd={handleAdd}
-                adding={addingTo === khata.name}
+                adding={addingTo === kharch.name}
               />
             )
           })}

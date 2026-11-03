@@ -125,9 +125,9 @@ export default function SplitPage() {
     <div className="coin-page">
       <TopBar />
 
-      <h1 className="coin-page__title">split</h1>
+      <h1 className="coin-page__title">Split</h1>
       <p className="coin-page__subtitle" style={{ marginBottom: '24px' }}>
-        Share trip and outing expenses with friends — Chillar works out who owes whom.
+        Share trip and outing expenses with friends — Paise works out who owes whom.
       </p>
 
       {/* Create a group */}

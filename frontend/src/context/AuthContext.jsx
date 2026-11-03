@@ -4,6 +4,9 @@ import { tokenStore } from '../api/client'
 
 const AuthContext = createContext(null)
 
+/** Flags a browser that chose guest mode, so the choice survives a refresh. */
+const GUEST_KEY = 'paise.guest'
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [isGuest, setIsGuest] = useState(false)
@@ -11,7 +14,7 @@ export function AuthProvider({ children }) {
 
   // On first paint, try to rebuild the session from a stored token.
   useEffect(() => {
-    const guestFlag = localStorage.getItem('chillar.guest') === 'true'
+    const guestFlag = localStorage.getItem(GUEST_KEY) === 'true'
     if (guestFlag) setIsGuest(true)
     
     let cancelled = false
@@ -43,12 +46,12 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('coin:unauthorized', handleUnauthorized)
   }, [])
 
-  const signIn = useCallback(async (credentials) => {
-    const data = await authApi.login(credentials)
-    tokenStore.set(data.token)
+  const signIn = useCallback(async (credentials, { rememberMe = false } = {}) => {
+    const data = await authApi.login({ ...credentials, rememberMe })
+    tokenStore.set(data.token, { persist: rememberMe })
     setUser(data.user)
     setIsGuest(false)
-    localStorage.removeItem('chillar.guest')
+    localStorage.removeItem(GUEST_KEY)
     return data.user
   }, [])
 
@@ -57,17 +60,17 @@ export function AuthProvider({ children }) {
     tokenStore.set(data.token)
     setUser(data.user)
     setIsGuest(false)
-    localStorage.removeItem('chillar.guest')
+    localStorage.removeItem(GUEST_KEY)
     return data.user
   }, [])
 
   const continueAsGuest = useCallback(async () => {
-    // Guests still get a real (throwaway) account so their khata lives in the DB.
+    // Guests still get a real (throwaway) account so their kharch lives in the DB.
     const data = await authApi.guestLogin()
     tokenStore.set(data.token)
     setUser(data.user)
     setIsGuest(true)
-    localStorage.setItem('chillar.guest', 'true')
+    localStorage.setItem(GUEST_KEY, 'true')
     return data.user
   }, [])
 
@@ -75,7 +78,7 @@ export function AuthProvider({ children }) {
     tokenStore.clear()
     setUser(null)
     setIsGuest(false)
-    localStorage.removeItem('chillar.guest')
+    localStorage.removeItem(GUEST_KEY)
   }, [])
 
   const value = useMemo(

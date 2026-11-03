@@ -81,6 +81,9 @@ export default function SplitGroupPage() {
   const [markingId, setMarkingId] = useState(null)
   const [deletingSettlementId, setDeletingSettlementId] = useState(null)
   const [removingPaymentId, setRemovingPaymentId] = useState(null)
+  const [editingSettlementId, setEditingSettlementId] = useState(null)
+  const [settlementEdit, setSettlementEdit] = useState(blankSettlement)
+  const [savingSettlement, setSavingSettlement] = useState(false)
   const [reconciling, setReconciling] = useState(false)
   const [historyPerson, setHistoryPerson] = useState('all')
   const [historySort, setHistorySort] = useState('date_desc')
@@ -379,6 +382,45 @@ export default function SplitGroupPage() {
       setError(errorMessage(err))
     } finally {
       setDeletingSettlementId(null)
+    }
+  }
+
+  /** Opens the inline editor for a logged settlement. */
+  function startEditSettlement(record) {
+    setEditingSettlementId(record.id)
+    setPayingId(null)
+    setSettlementEdit({
+      payerId: String(record.payerId),
+      receiverId: String(record.receiverId),
+      amount: String(record.amount),
+      date: record.date ?? todayIso(),
+      note: record.note ?? '',
+    })
+  }
+
+  async function handleSaveSettlement(event, record) {
+    event.preventDefault()
+    const { payerId, receiverId, amount } = settlementEdit
+    if (!payerId || !receiverId || !amount || savingSettlement) return
+
+    setSavingSettlement(true)
+    setError('')
+    setNotice('')
+    try {
+      await splitApi.updateSettlement(groupId, record.id, {
+        payerId: Number(payerId),
+        receiverId: Number(receiverId),
+        amount: Number(amount),
+        date: settlementEdit.date || todayIso(),
+        note: settlementEdit.note.trim() || null,
+      })
+      setEditingSettlementId(null)
+      setNotice('Settlement updated')
+      await load()
+    } catch (err) {
+      setError(errorMessage(err))
+    } finally {
+      setSavingSettlement(false)
     }
   }
 
@@ -761,6 +803,20 @@ export default function SplitGroupPage() {
                           <span className="coin-split-figure__label">fair share</span>
                           <span className="coin-split-figure__value">{money(row.fairShare)}</span>
                         </div>
+                        {/* The money that already moved by hand, so the net below
+                            can be read straight off this row. */}
+                        {row.settledOut > 0 && (
+                          <div className="coin-split-figure">
+                            <span className="coin-split-figure__label">settled out</span>
+                            <span className="coin-split-figure__value">{money(row.settledOut)}</span>
+                          </div>
+                        )}
+                        {row.settledIn > 0 && (
+                          <div className="coin-split-figure">
+                            <span className="coin-split-figure__label">settled in</span>
+                            <span className="coin-split-figure__value">{money(row.settledIn)}</span>
+                          </div>
+                        )}
                         <div className="coin-split-figure coin-split-figure--net">
                           <span className="coin-split-figure__label">net</span>
                           <span className={badge.className}>{badge.text}</span>
@@ -812,8 +868,9 @@ export default function SplitGroupPage() {
           <section className="coin-split-section">
             <h2 className="coin-section__title">settlement tracker</h2>
             <p className="coin-split-note">
-              Settlements you actually logged. The suggested transfers above are recalculated from the
-              expenses on every load and are never merged with these records.
+              Settlements you actually logged. Every instalment you record moves the balances in “who
+              owes what”, which is what the suggested transfers above are rebuilt from — pending records
+              move nothing until money is actually paid.
             </p>
 
             {settlementDashboard && (
@@ -821,10 +878,7 @@ export default function SplitGroupPage() {
                 <div className="coin-split-settle-card coin-split-settle-card--owed">
                   <span className="coin-split-stat-card__label">total owed</span>
                   <span className="coin-split-settle-card__value">{money(settlementDashboard.totalOwed)}</span>
-                  <span className="coin-split-stat-card__note">
-                    {settlementDashboard.totalRecords}{' '}
-                    {settlementDashboard.totalRecords === 1 ? 'record' : 'records'}
-                  </span>
+                  <span className="coin-split-stat-card__note">from the expenses</span>
                 </div>
                 <div className="coin-split-settle-card coin-split-settle-card--received">
                   <span className="coin-split-stat-card__label">received</span>
@@ -842,6 +896,9 @@ export default function SplitGroupPage() {
                   </span>
                   <span className="coin-split-stat-card__note">
                     {settlementDashboard.pendingCount} pending · {settlementDashboard.partialCount} part paid
+                    {' · '}
+                    {settlementDashboard.totalRecords}{' '}
+                    {settlementDashboard.totalRecords === 1 ? 'record' : 'records'}
                   </span>
                 </div>
                 <div className="coin-split-settle-card coin-split-settle-card--suggested">
@@ -849,7 +906,9 @@ export default function SplitGroupPage() {
                   <span className="coin-split-settle-card__value">
                     {money(settlementDashboard.suggestedOutstanding)}
                   </span>
-                  <span className="coin-split-stat-card__note">from current balances</span>
+                  <span className="coin-split-stat-card__note">
+                    after completed settlements
+                  </span>
                 </div>
               </div>
             )}
@@ -972,6 +1031,90 @@ export default function SplitGroupPage() {
                           className={`coin-split-record coin-split-record--${statusClass}`}
                           key={record.id}
                         >
+                          {editingSettlementId === record.id ? (
+                            <form
+                              className="coin-split-edit-form"
+                              onSubmit={(event) => handleSaveSettlement(event, record)}
+                            >
+                              <div className="coin-split-form__row">
+                                <select
+                                  className="coin-split-select"
+                                  value={settlementEdit.payerId}
+                                  onChange={(e) =>
+                                    setSettlementEdit((form) => ({ ...form, payerId: e.target.value }))
+                                  }
+                                  disabled={savingSettlement}
+                                >
+                                  {participantOptions()}
+                                </select>
+                                <select
+                                  className="coin-split-select"
+                                  value={settlementEdit.receiverId}
+                                  onChange={(e) =>
+                                    setSettlementEdit((form) => ({ ...form, receiverId: e.target.value }))
+                                  }
+                                  disabled={savingSettlement}
+                                >
+                                  {participantOptions()}
+                                </select>
+                                <input
+                                  className="coin-split-input coin-split-input--amount"
+                                  type="number"
+                                  min="0.01"
+                                  step="0.01"
+                                  value={settlementEdit.amount}
+                                  onChange={(e) =>
+                                    setSettlementEdit((form) => ({ ...form, amount: e.target.value }))
+                                  }
+                                  disabled={savingSettlement}
+                                />
+                                <input
+                                  className="coin-split-input coin-split-input--date"
+                                  type="date"
+                                  value={settlementEdit.date}
+                                  onChange={(e) =>
+                                    setSettlementEdit((form) => ({ ...form, date: e.target.value }))
+                                  }
+                                  disabled={savingSettlement}
+                                />
+                                <input
+                                  className="coin-split-input"
+                                  placeholder="note (optional)"
+                                  maxLength={255}
+                                  value={settlementEdit.note}
+                                  onChange={(e) =>
+                                    setSettlementEdit((form) => ({ ...form, note: e.target.value }))
+                                  }
+                                  disabled={savingSettlement}
+                                />
+                              </div>
+                              <div className="coin-split-record__actions">
+                                <Button
+                                  type="submit"
+                                  variant="primary"
+                                  size="sm"
+                                  disabled={savingSettlement || !settlementEdit.amount}
+                                >
+                                  {savingSettlement ? 'saving…' : 'save'}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditingSettlementId(null)}
+                                  disabled={savingSettlement}
+                                >
+                                  cancel
+                                </Button>
+                                {record.paidAmount > 0 && (
+                                  <span className="coin-split-edit-form__hint">
+                                    ₹{record.paidAmount} already paid — the amount cannot go below that.
+                                  </span>
+                                )}
+                              </div>
+                            </form>
+                          ) : (
+                            <>
                           <div className="coin-split-record__head">
                             <span className="coin-split-record__route">
                               <span className="coin-split-settlement__route--payer">
@@ -1118,12 +1261,22 @@ export default function SplitGroupPage() {
                               type="button"
                               variant="ghost"
                               size="sm"
+                              onClick={() => startEditSettlement(record)}
+                            >
+                              edit
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
                               onClick={() => handleDeleteSettlement(record)}
                               disabled={deletingSettlementId === record.id}
                             >
                               delete
                             </Button>
                           </div>
+                            </>
+                          )}
                         </div>
                       )
                     })}

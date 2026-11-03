@@ -8,7 +8,7 @@ import java.math.RoundingMode;
  * Evaluates the arithmetic a user can type straight into the entry box, e.g.
  * "100+50*2" or "(100+50)*2". Standard operator precedence applies.
  *
- * <p>Hand-written recursive descent on purpose: Chillar never runs the user's
+ * <p>Hand-written recursive descent on purpose: Paise never runs the user's
  * text as code, so there is no script engine, no eval and no reflection here.
  */
 public final class ArithmeticEvaluator {

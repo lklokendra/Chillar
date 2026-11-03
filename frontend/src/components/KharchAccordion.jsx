@@ -29,11 +29,11 @@ function LogRow({ transaction, deletingId, onDelete }) {
 }
 
 /**
- * One khata with its spending folded away behind a caret. Pass `onAdd` to get
- * the inline "add an entry to this khata" row inside the dropdown.
+ * One kharch with its spending folded away behind a caret. Pass `onAdd` to get
+ * the inline "add an entry to this kharch" row inside the dropdown.
  */
-export default function KhataAccordion({
-  khata,
+export default function KharchAccordion({
+  kharch,
   entries,
   isOpen,
   onToggle,
@@ -48,44 +48,44 @@ export default function KhataAccordion({
     event.preventDefault()
     const value = draft.trim()
     if (!value || adding) return
-    const ok = await onAdd(khata.name, value)
+    const ok = await onAdd(kharch.name, value)
     if (ok) setDraft('')
   }
 
   return (
-    <div className={`coin-khata coin-khata--${khata.color} ${isOpen ? 'is-open' : ''}`}>
+    <div className={`coin-kharch coin-kharch--${kharch.color} ${isOpen ? 'is-open' : ''}`}>
       <button
         type="button"
-        className="coin-khata__head"
-        onClick={() => onToggle(khata.name)}
+        className="coin-kharch__head"
+        onClick={() => onToggle(kharch.name)}
         aria-expanded={isOpen}
       >
-        <span className={`coin-pill coin-pill--${khata.color}`}>#{khata.name}</span>
-        <span className="coin-khata__side">
-          <span className="coin-khata__total">₹ {Number(khata.total).toLocaleString()}</span>
-          <span className="coin-khata__count">
+        <span className={`coin-pill coin-pill--${kharch.color}`}>#{kharch.name}</span>
+        <span className="coin-kharch__side">
+          <span className="coin-kharch__total">₹ {Number(kharch.total).toLocaleString()}</span>
+          <span className="coin-kharch__count">
             {entries.length} {entries.length === 1 ? 'entry' : 'entries'}
           </span>
-          <span className="coin-khata__caret" aria-hidden="true">
+          <span className="coin-kharch__caret" aria-hidden="true">
             {isOpen ? '−' : '+'}
           </span>
         </span>
       </button>
 
       {isOpen && (
-        <div className="coin-khata__body">
+        <div className="coin-kharch__body">
           {onAdd && (
-            <form className="coin-khata__add" onSubmit={handleAdd}>
+            <form className="coin-kharch__add" onSubmit={handleAdd}>
               <input
-                className="coin-khata__add-input"
-                placeholder={`add to #${khata.name} — e.g. 200 groceries`}
+                className="coin-kharch__add-input"
+                placeholder={`add to #${kharch.name} — e.g. 200 groceries`}
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 disabled={adding}
               />
               <button
                 type="submit"
-                className="coin-khata__add-btn"
+                className="coin-kharch__add-btn"
                 disabled={adding || !draft.trim()}
               >
                 {adding ? '…' : 'add'}
@@ -94,7 +94,7 @@ export default function KhataAccordion({
           )}
 
           {entries.length === 0 ? (
-            <p className="coin-muted">Nothing logged in #{khata.name} yet.</p>
+            <p className="coin-muted">Nothing logged in #{kharch.name} yet.</p>
           ) : (
             entries.map((transaction) => (
               <LogRow

@@ -1,13 +1,13 @@
 /*
  * History page styles.
  *
- * Everything here is namespaced under .coin-history-page so the khata / log
+ * Everything here is namespaced under .coin-history-page so the kharch / log
  * overrides never leak into the Dashboard, which renders the very same shared
- * KhataAccordion component (classes .coin-khata / .coin-log / .coin-pill live
+ * KharchAccordion component (classes .coin-kharch / .coin-log / .coin-pill live
  * in global.css). Only the summary strip reuses global .coin-grid / .coin-tile
  * modifiers, scoped so the Dashboard is unaffected.
  *
- * The hues below mirror the existing khata wash system in global.css exactly:
+ * The hues below mirror the existing kharch wash system in global.css exactly:
  * mint #f2fbf9/#d6efe9, yellow #fffdf3/#f3ebc9, blue #f4f9ff/#d6e6f7,
  * rose #fff6f7/#f7d9df (open borders #0d9488 / #d97706 / #2563eb / #e11d48).
  */
@@ -158,29 +158,29 @@
   }
 }
 
-/* --------------------------------------------------- khata container */
+/* --------------------------------------------------- kharch container */
 
-.coin-history-page .coin-khata {
+.coin-history-page .coin-kharch {
   border-radius: var(--coin-radius-lg);
   box-shadow: var(--coin-shadow-sm);
 }
 
-.coin-history-page .coin-khata__head {
+.coin-history-page .coin-kharch__head {
   padding: 16px 20px;
 }
 
-.coin-history-page .coin-khata__body {
+.coin-history-page .coin-kharch__body {
   padding: 0 14px 14px;
   border-top: 1px solid var(--coin-row-line);
 }
 
-.coin-history-page .coin-khata__add {
+.coin-history-page .coin-kharch__add {
   margin: 12px 4px 10px;
 }
 
 /* ------------------------------- colourful, scannable transaction rows */
 
-.coin-history-page .coin-khata .coin-log {
+.coin-history-page .coin-kharch .coin-log {
   gap: 14px;
   margin-top: 8px;
   padding: 11px 14px;
@@ -192,49 +192,49 @@
   transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.coin-history-page .coin-khata .coin-log:hover {
+.coin-history-page .coin-kharch .coin-log:hover {
   background: var(--coin-surface);
 }
 
-/* Reinforce each khata's own pastel wash with a matching left accent. */
-.coin-history-page .coin-khata--mint .coin-log {
+/* Reinforce each kharch's own pastel wash with a matching left accent. */
+.coin-history-page .coin-kharch--mint .coin-log {
   border-color: var(--coin-mint-card-line);
   box-shadow: inset 3px 0 0 0 var(--coin-mint);
 }
 
-.coin-history-page .coin-khata--yellow .coin-log {
+.coin-history-page .coin-kharch--yellow .coin-log {
   border-color: var(--coin-amber-card-line);
   box-shadow: inset 3px 0 0 0 var(--coin-amber);
 }
 
-.coin-history-page .coin-khata--blue .coin-log {
+.coin-history-page .coin-kharch--blue .coin-log {
   border-color: var(--coin-blue-card-line);
   box-shadow: inset 3px 0 0 0 var(--coin-blue);
 }
 
-.coin-history-page .coin-khata--rose .coin-log {
+.coin-history-page .coin-kharch--rose .coin-log {
   border-color: var(--coin-rose-card-line);
   box-shadow: inset 3px 0 0 0 var(--coin-rose);
 }
 
 /* Keep the card border on the final row (global.css removes it). */
-.coin-history-page .coin-khata__body .coin-log:last-child {
+.coin-history-page .coin-kharch__body .coin-log:last-child {
   border-bottom: 1px solid var(--coin-overlay-line);
 }
 
-.coin-history-page .coin-khata--mint .coin-log:last-child {
+.coin-history-page .coin-kharch--mint .coin-log:last-child {
   border-bottom-color: var(--coin-mint-card-line);
 }
 
-.coin-history-page .coin-khata--yellow .coin-log:last-child {
+.coin-history-page .coin-kharch--yellow .coin-log:last-child {
   border-bottom-color: var(--coin-amber-card-line);
 }
 
-.coin-history-page .coin-khata--blue .coin-log:last-child {
+.coin-history-page .coin-kharch--blue .coin-log:last-child {
   border-bottom-color: var(--coin-blue-card-line);
 }
 
-.coin-history-page .coin-khata--rose .coin-log:last-child {
+.coin-history-page .coin-kharch--rose .coin-log:last-child {
   border-bottom-color: var(--coin-rose-card-line);
 }
 

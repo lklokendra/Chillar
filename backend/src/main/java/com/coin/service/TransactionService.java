@@ -19,7 +19,7 @@ import com.coin.util.ArithmeticEvaluator;
 /**
  * Turns a single free-text entry such as "100 chai #office" into a stored
  * transaction. Numbers become the amount, words become the note and any
- * "#tag" picks the khata (category).
+ * "#tag" picks the kharch (category).
  *
  * <p>Amounts may be written as arithmetic ("100+50*2", "(500-100)/2"), which is
  * worked out by {@link ArithmeticEvaluator}. Every entry must resolve to a
@@ -156,7 +156,7 @@ public class TransactionService {
                 });
     }
 
-    /** Outcome of reading an entry: what it costs, what it says and its khata. */
+    /** Outcome of reading an entry: what it costs, what it says and its kharch. */
     public record ParsedEntry(BigDecimal amount, String note, String categoryName, String validationMessage) {
     }
 }

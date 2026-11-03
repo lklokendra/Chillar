@@ -5,10 +5,10 @@ import ThemeToggle from './ThemeToggle'
 import { useAuth } from '../context/AuthContext'
 
 const SECTIONS = [
-  { to: '/', label: 'khatas', end: true },
-  { to: '/history', label: 'history' },
-  { to: '/gullak', label: 'gullak' },
-  { to: '/split', label: 'split' },
+  { to: '/', label: 'Kharch', end: true },
+  { to: '/history', label: 'History' },
+  { to: '/gullak', label: 'Gullak' },
+  { to: '/split', label: 'Split' },
 ]
 
 /** Shared header: brand, section navigation and sign out. */

@@ -1,4 +1,4 @@
-/** Shared helpers for the one-line entry format and the khata suggestions. */
+/** Shared helpers for the one-line entry format and the kharch suggestions. */
 
 import { evaluateExpression, roundMoney } from './arithmetic'
 
@@ -20,8 +20,8 @@ export const TOO_MANY_GULLAK_TAGS = 'Use one hashtag only — that is the goal t
 export const GOAL_NAME_TOO_LONG = 'That goal name is too long — keep it under 120 characters.'
 
 /**
- * Starter khatas shown to a brand new account. Each one disappears from the
- * suggestion row the moment the user logs an entry into a khata of that name.
+ * Starter kharch shown to a brand new account. Each one disappears from the
+ * suggestion row the moment the user logs an entry into a kharch of that name.
  */
 export const PRESET_CATEGORIES = [
   'food',
@@ -59,12 +59,12 @@ export function withoutTag(value) {
 }
 
 /**
- * User khatas first, topped up with presets they haven't logged against yet.
- * Once they've created enough khatas of their own the presets are gone.
+ * User kharch first, topped up with presets they haven't logged against yet.
+ * Once they've created enough kharch of their own the presets are gone.
  */
-export function buildSuggestions(userKhatas, limit = 8) {
-  const own = userKhatas.map((khata) => ({ name: khata.name, color: khata.color }))
-  const used = new Set(own.map((khata) => khata.name.toLowerCase()))
+export function buildSuggestions(userKharch, limit = 8) {
+  const own = userKharch.map((kharch) => ({ name: kharch.name, color: kharch.color }))
+  const used = new Set(own.map((kharch) => kharch.name.toLowerCase()))
 
   const presets = PRESET_CATEGORIES.filter((name) => !used.has(name))
     .slice(0, Math.max(0, limit - own.length))
@@ -96,11 +96,11 @@ function isNumberish(token) {
 
 /**
  * Mirrors TransactionService.parse on the backend: works out the amount (with
- * arithmetic), the note and the khata straight from the entry box, so the UI can
+ * arithmetic), the note and the kharch straight from the entry box, so the UI can
  * preview the total and warn before anything is sent to the server.
  *
  * <p>The gullak reuses this exact parser, but a hashtag there names a savings
- * goal instead of a khata: the result carries `goal` (the tag as the user typed
+ * goal instead of a kharch: the result carries `goal` (the tag as the user typed
  * it, so the server can keep a friendly display name) as well as the lowercase
  * `category`. Pass `{ singleTag: true }` where only one tag makes sense — a
  * savings entry belongs to one goal, so "#laptop #goa" is rejected rather than

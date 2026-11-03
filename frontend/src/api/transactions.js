@@ -1,6 +1,6 @@
 import { api } from './client'
 
-export const getKhatas = () => api.get('/transactions/khatas').then((res) => res.data)
+export const getKharch = () => api.get('/transactions/kharch').then((res) => res.data)
 
 export const getTransactions = (category) => 
   api.get('/transactions', { params: { category } }).then((res) => res.data)

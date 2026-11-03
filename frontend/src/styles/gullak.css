@@ -1,7 +1,7 @@
 /* --------------------------------------------------------------- gullak */
 /*
  * Gullak page styles. Everything is prefixed coin-gullak- and reuses the shared
- * tokens so it matches the khata/history look: monospace body, black rounded
+ * tokens so it matches the kharch/history look: monospace body, black rounded
  * buttons and light mint (deposit) / rose (withdrawal) washes.
  */
 
@@ -847,6 +847,8 @@
   font-weight: 900;
   letter-spacing: -0.03em;
   line-height: 1.1;
+  /* Show the goal name exactly as the user typed it. */
+  text-transform: none;
 }
 
 .coin-goalpage-head__desc {

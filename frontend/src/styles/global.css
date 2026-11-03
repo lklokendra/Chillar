@@ -54,28 +54,32 @@ a:hover {
   gap: 10px;
 }
 
+/* The P coin mark is an image asset swapped by Brand.jsx. Its rounded-square
+   shape, coin and depth all come from the file, so no background or radius here. */
 .coin-brand__mark {
-  display: grid;
-  place-items: center;
+  display: block;
+  flex-shrink: 0;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
-  background: var(--coin-ink);
-  color: var(--coin-on-ink);
-  font-family: var(--coin-font-mono);
-  font-size: 18px;
-  font-weight: 900;
-  line-height: 1;
+  object-fit: contain;
+}
+
+.coin-brand__mark--lg {
+  width: 40px;
+  height: 40px;
 }
 
 .coin-brand__name {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 900;
   letter-spacing: -0.05em;
   line-height: 1;
-  text-transform: lowercase;
   color: var(--coin-ink);
   font-family: var(--coin-font);
+}
+
+.coin-brand__name--lg {
+  font-size: 36px;
 }
 
 .coin-brand__tag {
@@ -141,12 +145,34 @@ a:hover {
   text-align: center;
 }
 
-/* Small right-aligned helper row, e.g. the "Forgot password?" link. */
+/* Row under the password field: "Remember me" on the left, link on the right. */
 .coin-auth__meta {
   display: flex;
-  justify-content: flex-end;
-  margin-top: -6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: -4px;
   font-size: 13px;
+}
+
+/* Hairline "OR" rule between the primary action and the alternative ones. */
+.coin-auth__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--coin-text-muted);
+}
+
+.coin-auth__divider::before,
+.coin-auth__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--coin-hairline);
 }
 
 /* Vertical stack for the reset screen's message + token + CTA. */
@@ -156,7 +182,7 @@ a:hover {
   margin-top: 22px;
 }
 
-/* The raw one-time reset token shown while Chillar has no mail transport. */
+/* The raw one-time reset token shown while Paise has no mail transport. */
 .coin-token {
   display: block;
   padding: 10px 12px;
@@ -224,6 +250,174 @@ a:hover {
   color: var(--coin-text-muted);
 }
 
+/* A password field needs a slot beside the input for the show/hide button. */
+.coin-field__wrap {
+  position: relative;
+  display: block;
+}
+
+.coin-field__input--with-affix {
+  padding-right: 44px;
+}
+
+.coin-field__toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--coin-control-text);
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.coin-field__toggle:hover {
+  color: var(--coin-ink);
+  background: var(--coin-surface-soft);
+}
+
+.coin-field__toggle:focus-visible {
+  outline: 2px solid var(--coin-primary);
+  outline-offset: 2px;
+}
+
+.coin-field__toggle-icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Ties a field to the helper block that belongs to it (e.g. the rules list). */
+.coin-field-group {
+  display: grid;
+  gap: 8px;
+}
+
+/* ------------------------------------------------------ password strength */
+
+.coin-strength {
+  display: grid;
+  gap: 7px;
+}
+
+.coin-strength__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coin-strength__bars {
+  display: flex;
+  flex: 1;
+  gap: 4px;
+}
+
+.coin-strength__bars > span {
+  flex: 1;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--coin-border-strong);
+  transition: background 0.2s ease;
+}
+
+.coin-strength[data-strength='weak'] .coin-strength__bars > span.is-on { background: var(--coin-rose); }
+.coin-strength[data-strength='fair'] .coin-strength__bars > span.is-on { background: var(--coin-amber); }
+.coin-strength[data-strength='good'] .coin-strength__bars > span.is-on { background: var(--coin-blue); }
+.coin-strength[data-strength='strong'] .coin-strength__bars > span.is-on { background: var(--coin-mint); }
+
+.coin-strength__label {
+  font-family: var(--coin-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--coin-text-muted);
+}
+
+.coin-strength__rules {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.coin-strength__rules li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--coin-text-muted);
+  transition: color 0.15s ease;
+}
+
+.coin-strength__rules li.is-met {
+  color: var(--coin-mint-ink);
+}
+
+.coin-strength__tick {
+  width: 12px;
+  font-size: 10px;
+  line-height: 1;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- checkboxes */
+
+.coin-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--coin-text-soft);
+  cursor: pointer;
+  user-select: none;
+}
+
+.coin-check__box {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--coin-ink);
+  cursor: pointer;
+}
+
+.coin-check__box:focus-visible {
+  outline: 2px solid var(--coin-primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------- spinner */
+
+.coin-spinner {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: coin-spin 0.7s linear infinite;
+}
+
+@keyframes coin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* --------------------------------------------------------------- buttons */
 
 .coin-btn {
@@ -250,6 +444,11 @@ a:hover {
   background: var(--coin-ink-hover);
 }
 
+.coin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Pill/Badge styles from screenshots */
 .coin-pill {
   display: inline-block;
@@ -261,9 +460,9 @@ a:hover {
   margin-bottom: 12px;
 }
 
-/* ------------------------------------------------------- khata accordion */
+/* ------------------------------------------------------- kharch accordion */
 
-.coin-khata {
+.coin-kharch {
   border: 1px solid var(--coin-chip-border);
   border-radius: 12px;
   background: var(--coin-surface);
@@ -271,15 +470,15 @@ a:hover {
   transition: border-color 0.15s ease;
 }
 
-.coin-khata:hover {
+.coin-kharch:hover {
   border-color: var(--coin-border-strong);
 }
 
-.coin-khata.is-open {
+.coin-kharch.is-open {
   border-color: var(--coin-ink);
 }
 
-.coin-khata__head {
+.coin-kharch__head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -293,26 +492,26 @@ a:hover {
   cursor: pointer;
 }
 
-.coin-khata__side {
+.coin-kharch__side {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.coin-khata__total {
+.coin-kharch__total {
   font-family: var(--coin-font-mono);
   font-size: 16px;
   font-weight: 600;
 }
 
-.coin-khata__count {
+.coin-kharch__count {
   font-family: var(--coin-font-mono);
   font-size: 11px;
   opacity: 0.4;
   white-space: nowrap;
 }
 
-.coin-khata__caret {
+.coin-kharch__caret {
   display: grid;
   place-items: center;
   width: 22px;
@@ -325,35 +524,35 @@ a:hover {
   color: var(--coin-control-text);
 }
 
-.coin-khata.is-open .coin-khata__caret {
+.coin-kharch.is-open .coin-kharch__caret {
   background: var(--coin-ink);
   color: var(--coin-on-ink);
 }
 
-.coin-khata__body {
+.coin-kharch__body {
   padding: 0 18px 10px;
   border-top: 1px solid var(--coin-hairline);
 }
 
-/* Each khata gets a light wash keyed to its badge colour. */
-.coin-khata--mint { background: var(--coin-mint-card); border-color: var(--coin-mint-card-line); }
-.coin-khata--yellow { background: var(--coin-amber-card); border-color: var(--coin-amber-card-line); }
-.coin-khata--blue { background: var(--coin-blue-card); border-color: var(--coin-blue-card-line); }
-.coin-khata--rose { background: var(--coin-rose-card); border-color: var(--coin-rose-card-line); }
+/* Each kharch gets a light wash keyed to its badge colour. */
+.coin-kharch--mint { background: var(--coin-mint-card); border-color: var(--coin-mint-card-line); }
+.coin-kharch--yellow { background: var(--coin-amber-card); border-color: var(--coin-amber-card-line); }
+.coin-kharch--blue { background: var(--coin-blue-card); border-color: var(--coin-blue-card-line); }
+.coin-kharch--rose { background: var(--coin-rose-card); border-color: var(--coin-rose-card-line); }
 
-.coin-khata--mint.is-open { border-color: var(--coin-mint); }
-.coin-khata--yellow.is-open { border-color: var(--coin-amber); }
-.coin-khata--blue.is-open { border-color: var(--coin-blue); }
-.coin-khata--rose.is-open { border-color: var(--coin-rose); }
+.coin-kharch--mint.is-open { border-color: var(--coin-mint); }
+.coin-kharch--yellow.is-open { border-color: var(--coin-amber); }
+.coin-kharch--blue.is-open { border-color: var(--coin-blue); }
+.coin-kharch--rose.is-open { border-color: var(--coin-rose); }
 
-/* Inline "add an entry to this khata" row inside the dropdown. */
-.coin-khata__add {
+/* Inline "add an entry to this kharch" row inside the dropdown. */
+.coin-kharch__add {
   display: flex;
   gap: 8px;
   margin: 12px 0 8px;
 }
 
-.coin-khata__add-input {
+.coin-kharch__add-input {
   flex: 1;
   min-width: 0;
   padding: 9px 12px;
@@ -366,12 +565,12 @@ a:hover {
   outline: none;
 }
 
-.coin-khata__add-input:focus {
+.coin-kharch__add-input:focus {
   border-color: var(--coin-ink);
   background: var(--coin-field-bg-focus);
 }
 
-.coin-khata__add-btn {
+.coin-kharch__add-btn {
   flex-shrink: 0;
   padding: 0 16px;
   border: 1px solid var(--coin-ink);
@@ -384,12 +583,12 @@ a:hover {
   cursor: pointer;
 }
 
-.coin-khata__add-btn:disabled {
+.coin-kharch__add-btn:disabled {
   opacity: 0.35;
   cursor: default;
 }
 
-/* --------------------------------------------------- khata suggestions */
+/* --------------------------------------------------- kharch suggestions */
 
 .coin-suggest {
   display: flex;
@@ -431,7 +630,7 @@ a:hover {
   color: var(--coin-ink);
 }
 
-/* Light colour per preset chip, matching its khata wash. */
+/* Light colour per preset chip, matching its kharch wash. */
 .coin-suggest__chip--mint { background: var(--coin-mint-chip); border-color: var(--coin-mint-chip-line); color: var(--coin-mint-chip-ink); }
 .coin-suggest__chip--yellow { background: var(--coin-amber-chip); border-color: var(--coin-amber-chip-line); color: var(--coin-amber-chip-ink); }
 .coin-suggest__chip--blue { background: var(--coin-blue-soft-2); border-color: var(--coin-blue-line-2); color: var(--coin-blue-ink); }
@@ -618,12 +817,12 @@ a:hover {
   gap: 16px;
 }
 
-.coin-khata__body .coin-log {
+.coin-kharch__body .coin-log {
   padding-left: 0;
   padding-right: 0;
 }
 
-.coin-khata__body .coin-log:last-child {
+.coin-kharch__body .coin-log:last-child {
   border-bottom: none;
 }
 
@@ -835,6 +1034,9 @@ a:hover {
   font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  /* Section titles keep their authored capitals (Kharch, History, ...) and
+     user-generated names (goal/group) show exactly as they were entered. */
+  text-transform: none;
 }
 
 .coin-page__subtitle {
@@ -972,7 +1174,6 @@ a:hover {
 .coin-history-btn__title {
   font-size: 22px;
   font-weight: 900;
-  text-transform: lowercase;
   letter-spacing: -0.02em;
 }
 
@@ -1050,11 +1251,18 @@ a:hover {
 @media (max-width: 480px) {
   .coin-auth {
     gap: 18px;
-    padding: 28px 16px;
+    /* Top padding clears the fixed theme toggle so the brand never sits under it. */
+    padding: 56px 16px 32px;
   }
 
   .coin-auth__card {
+    max-width: 100%;
     padding: 22px 18px;
+  }
+
+  /* 16px is the threshold below which iOS zooms the page when a field is focused. */
+  .coin-field__input {
+    font-size: 16px;
   }
 
   .coin-page {
@@ -1070,12 +1278,52 @@ a:hover {
     font-size: 11px;
   }
 
+  /* Smaller mark so the brand and nav still share one row on a phone. */
+  .coin-brand__mark {
+    width: 28px;
+    height: 28px;
+  }
+
+  .coin-brand__mark--lg {
+    width: 36px;
+    height: 36px;
+  }
+
   .coin-entry-row {
     flex-wrap: wrap;
   }
 
   .coin-entry-input {
     font-size: 24px;
+  }
+}
+
+/* Narrowest phones (320-360px): tighten padding before anything can overflow. */
+@media (max-width: 360px) {
+  .coin-auth {
+    gap: 16px;
+    padding: 52px 12px 28px;
+  }
+
+  .coin-auth__card {
+    padding: 18px 14px;
+  }
+
+  .coin-auth__form {
+    gap: 12px;
+  }
+
+  .coin-field__input {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .coin-field__input--with-affix {
+    padding-right: 40px;
+  }
+
+  .coin-strength__rules li {
+    font-size: 11px;
   }
 }
 

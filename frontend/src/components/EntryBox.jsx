@@ -1,7 +1,7 @@
 import { formatAmount } from '../utils/entry'
 
 /**
- * The one-line entry card shared by the khata dashboard and the gullak: rupee
+ * The one-line entry card shared by the kharch dashboard and the gullak: rupee
  * sign + input + live amount preview on one line, an optional action row
  * underneath, and the date picker in the footer.
  *

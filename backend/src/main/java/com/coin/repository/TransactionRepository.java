@@ -1,14 +1,16 @@
 package com.coin.repository;
 
-import com.coin.entity.Category;
-import com.coin.entity.Transaction;
-import com.coin.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.coin.entity.Category;
+import com.coin.entity.Transaction;
+import com.coin.entity.User;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
@@ -30,7 +32,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     BigDecimal sumAmountByUser(@Param("user") User user);
 
     /**
-     * Every khata entry inside an inclusive date range, oldest first. The
+     * Every kharch entry inside an inclusive date range, oldest first. The
      * category is fetched eagerly because the insights engine reads category
      * names while open-in-view is disabled.
      */

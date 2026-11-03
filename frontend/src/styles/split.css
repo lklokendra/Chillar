@@ -932,6 +932,17 @@
   flex: 1;
 }
 
+/* Inline editor that replaces a settlement record's body while editing. */
+.coin-split-edit-form {
+  display: grid;
+  gap: 10px;
+}
+
+.coin-split-edit-form__hint {
+  font-size: 11px;
+  color: var(--coin-text-muted);
+}
+
 .coin-split-status {
   display: inline-flex;
   align-items: center;
@@ -1071,6 +1082,7 @@
 
 /* -------------------------------------------------------------- responsive */
 
+/* Tablet: the four roll-up cards pair up and the audit list stacks. */
 @media (max-width: 900px) {
   .coin-split-settle-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1082,18 +1094,70 @@
   }
 }
 
-@media (max-width: 480px) {
-  .coin-split-card {
-    padding: 16px 16px;
+/*
+ * Phone. Below ~600px every horizontal arrangement in the Split page stops
+ * fitting, so each one is re-flowed: forms stack, figures become a grid that
+ * wraps instead of squeezing, and names are allowed to break rather than push
+ * the layout sideways. 16px inputs keep iOS from zooming on focus.
+ */
+@media (max-width: 600px) {
+  /* Forms: one control per line, all full width. */
+  .coin-split-form__row {
+    flex-direction: column;
   }
 
-  .coin-split-settle-stats {
-    grid-template-columns: minmax(0, 1fr);
+  .coin-split-input,
+  .coin-split-input--amount,
+  .coin-split-input--date,
+  .coin-split-select {
+    width: 100%;
+    max-width: none;
+    font-size: 16px;
   }
 
   .coin-split-select--compact {
-    max-width: none;
     width: 100%;
+    max-width: none;
+  }
+
+  /* Who owes what: stack the person above their figures, then lay the figures
+     out as a wrapping grid so no column is ever crushed. */
+  .coin-split-summary-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .coin-split-summary__figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+    gap: 10px;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .coin-split-figure {
+    min-width: 0;
+    padding: 0;
+    border-left: none;
+    justify-items: start;
+  }
+
+  /* Settle up: the amount keeps its own place, names wrap instead of pushing. */
+  .coin-split-settlement__route {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .coin-split-settlement__amount {
+    flex: none;
+  }
+
+  /* Settlement records: same treatment for the payer → receiver line. */
+  .coin-split-record__route {
+    flex-wrap: wrap;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .coin-split-record__figures .coin-split-figure {
@@ -1105,54 +1169,6 @@
     padding-left: 12px;
   }
 
-  .coin-split-card {
-    padding: 16px 16px;
-  }
-
-  .coin-split-stats {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .coin-split-stat-card--total {
-    grid-column: auto;
-  }
-
-  .coin-split-stat-card--total .coin-split-stat-card__value {
-    font-size: 30px;
-  }
-
-  .coin-split-group {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .coin-split-summary-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .coin-split-summary__figures {
-    width: 100%;
-    margin-left: 0;
-    justify-content: space-between;
-  }
-
-  .coin-split-figure {
-    min-width: 0;
-    padding: 0 12px;
-  }
-
-  .coin-split-form__row {
-    flex-direction: column;
-  }
-
-  .coin-split-input,
-  .coin-split-input--amount,
-  .coin-split-input--date,
-  .coin-split-select {
-    max-width: none;
-  }
-
   .coin-split-person__name {
     max-width: none;
   }
@@ -1160,5 +1176,65 @@
   .coin-split-expense__side {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .coin-split-expense__title {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .coin-split-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .coin-split-card {
+    padding: 16px 14px;
+  }
+
+  .coin-split-stat-card--total .coin-split-stat-card__value {
+    font-size: 30px;
+  }
+
+  .coin-split-settle-card__value {
+    font-size: 20px;
+  }
+
+  .coin-split-history-bar .coin-split-select--compact {
+    flex: 1 1 100%;
+  }
+}
+
+/* Very small phones: everything collapses to a single column. */
+@media (max-width: 360px) {
+  .coin-split-stats,
+  .coin-split-settle-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .coin-split-stat-card {
+    padding: 16px 14px;
+  }
+
+  .coin-split-stat-card--total .coin-split-stat-card__value {
+    font-size: 26px;
+  }
+
+  .coin-split-summary__figures {
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    gap: 8px;
+  }
+
+  .coin-split-figure__value,
+  .coin-split-balance {
+    font-size: 12px;
+  }
+
+  .coin-split-settlement,
+  .coin-split-record,
+  .coin-split-expense {
+    padding: 12px 12px;
   }
 }

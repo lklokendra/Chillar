@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import EntryBox from '../components/EntryBox'
-import KhataAccordion from '../components/KhataAccordion'
+import KharchAccordion from '../components/KharchAccordion'
 import TopBar from '../components/TopBar'
 import { useAuth } from '../context/AuthContext'
 import * as transactionApi from '../api/transactions'
@@ -20,7 +20,7 @@ import {
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user, isGuest } = useAuth()
-  const [khatas, setKhatas] = useState([])
+  const [kharch, setKharch] = useState([])
   const [transactions, setTransactions] = useState([])
   const [entryInput, setEntryInput] = useState('')
   const [entryDate, setEntryDate] = useState(todayIso())
@@ -29,25 +29,27 @@ export default function DashboardPage() {
   const [notice, setNotice] = useState('')
   const [entryWarning, setEntryWarning] = useState('')
   const [deletingId, setDeletingId] = useState(null)
-  const [expandedKhata, setExpandedKhata] = useState(null)
+  const [expandedKharch, setExpandedKharch] = useState(null)
   const inputRef = useRef(null)
 
-  const firstName = isGuest ? 'Guest' : (user?.name?.split(' ')[0] ?? 'there')
-  const totalAll = Number(khatas.find((k) => k.name === 'all')?.total ?? 0)
-  const spendKhatas = khatas.filter((k) => k.name !== 'all')
-  const topKhata = [...spendKhatas].sort((a, b) => Number(b.total) - Number(a.total))[0]
+  const rawFirstName = isGuest ? 'Guest' : (user?.name?.split(' ')[0] ?? 'there')
+  // Greet with a capitalised first letter without touching the rest of the name.
+  const firstName = rawFirstName.charAt(0).toUpperCase() + rawFirstName.slice(1)
+  const totalAll = Number(kharch.find((k) => k.name === 'all')?.total ?? 0)
+  const spendKharch = kharch.filter((k) => k.name !== 'all')
+  const topKharch = [...spendKharch].sort((a, b) => Number(b.total) - Number(a.total))[0]
   const entryCount = transactions.length
   const activeTag = tagInInput(entryInput)
-  const suggestions = buildSuggestions(spendKhatas)
+  const suggestions = buildSuggestions(spendKharch)
   // What the entry box currently adds up to — shown before anything is saved.
   const preview = parseEntry(entryInput)
 
-  const entriesByKhata = {}
+  const entriesByKharch = {}
   for (const transaction of transactions) {
-    if (!entriesByKhata[transaction.categoryName]) {
-      entriesByKhata[transaction.categoryName] = []
+    if (!entriesByKharch[transaction.categoryName]) {
+      entriesByKharch[transaction.categoryName] = []
     }
-    entriesByKhata[transaction.categoryName].push(transaction)
+    entriesByKharch[transaction.categoryName].push(transaction)
   }
 
   useEffect(() => {
@@ -56,11 +58,11 @@ export default function DashboardPage() {
 
   async function refresh() {
     try {
-      const [khataData, transactionData] = await Promise.all([
-        transactionApi.getKhatas(),
+      const [kharchData, transactionData] = await Promise.all([
+        transactionApi.getKharch(),
         transactionApi.getTransactions(),
       ])
-      setKhatas(khataData)
+      setKharch(kharchData)
       setTransactions(transactionData)
     } catch (err) {
       setError(errorMessage(err))
@@ -103,14 +105,14 @@ export default function DashboardPage() {
     }
   }
 
-  /** Clicking a suggested khata tags the entry without typing the "#". */
+  /** Clicking a suggested kharch tags the entry without typing the "#". */
   function applyCategory(name) {
     setEntryInput(activeTag === name.toLowerCase() ? withoutTag(entryInput) : withTag(entryInput, name))
     inputRef.current?.focus()
   }
 
-  function toggleKhata(name) {
-    setExpandedKhata((current) => (current === name ? null : name))
+  function toggleKharch(name) {
+    setExpandedKharch((current) => (current === name ? null : name))
   }
 
   async function handleDelete(transaction) {
@@ -138,12 +140,12 @@ export default function DashboardPage() {
       <TopBar />
 
       <div style={{ marginTop: '20px' }}>
-        <h1 className="coin-page__title">hi {firstName}</h1>
+        <h1 className="coin-page__title">Hi {firstName}</h1>
         <p className="coin-page__subtitle" style={{ marginBottom: '32px' }}>
-          {isGuest ? 'You are exploring Chillar as a guest.' : 'Welcome back to your khata.'}
+          {isGuest ? 'You are exploring Paise as a guest.' : 'Welcome back to your kharch.'}
         </p>
 
-        {/* Suggested khatas — tap one instead of typing "#name". */}
+        {/* Suggested kharch — tap one instead of typing "#name". */}
         {suggestions.length > 0 && (
           <div className="coin-suggest">
             <span className="coin-suggest__label">tap to tag</span>
@@ -211,44 +213,44 @@ export default function DashboardPage() {
           <div className="coin-tile coin-tile--ink">
             <div className="coin-tile__label">Total Spends</div>
             <div className="coin-tile__value">₹ {totalAll.toLocaleString()}</div>
-            <div className="coin-tile__note">Combined across all khatas</div>
+            <div className="coin-tile__note">Combined across all kharch</div>
           </div>
           <div className="coin-tile coin-tile--mint">
             <div className="coin-tile__label">Top Category</div>
             <div className="coin-tile__value" style={{ fontSize: '18px', textTransform: 'capitalize' }}>
-              {topKhata?.name || 'None'}
+              {topKharch?.name || 'None'}
             </div>
             <div className="coin-tile__note">
-              {topKhata ? `₹ ${Number(topKhata.total).toLocaleString()} spent` : 'No spending yet'}
+              {topKharch ? `₹ ${Number(topKharch.total).toLocaleString()} spent` : 'No spending yet'}
             </div>
           </div>
           <div className="coin-tile coin-tile--blue">
             <div className="coin-tile__label">Entries</div>
             <div className="coin-tile__value">{entryCount}</div>
             <div className="coin-tile__note">
-              across {spendKhatas.length} {spendKhatas.length === 1 ? 'khata' : 'khatas'}
+              across {spendKharch.length} kharch
             </div>
           </div>
         </div>
 
         <div className="coin-pill coin-pill--mint">#all</div>
-        <h1 style={{ fontSize: '48px', marginTop: '12px', marginBottom: '16px' }}>khatas</h1>
+        <h1 style={{ fontSize: '48px', marginTop: '12px', marginBottom: '16px', textTransform: 'none' }}>Kharch</h1>
         <p className="coin-muted" style={{ marginBottom: '32px' }}>
-          tap a khata to see everything spent in it
+          tap a kharch to see everything spent in it
         </p>
 
         <div style={{ display: 'grid', gap: '12px' }}>
-          {spendKhatas.length === 0 && (
-            <div className="coin-muted">No khatas yet. Log something like “100 chai #food”.</div>
+          {spendKharch.length === 0 && (
+            <div className="coin-muted">No kharch yet. Log something like “100 chai #food”.</div>
           )}
 
-          {spendKhatas.map((khata) => (
-            <KhataAccordion
-              key={khata.name}
-              khata={khata}
-              entries={entriesByKhata[khata.name] ?? []}
-              isOpen={expandedKhata === khata.name}
-              onToggle={toggleKhata}
+          {spendKharch.map((kharch) => (
+            <KharchAccordion
+              key={kharch.name}
+              kharch={kharch}
+              entries={entriesByKharch[kharch.name] ?? []}
+              isOpen={expandedKharch === kharch.name}
+              onToggle={toggleKharch}
               deletingId={deletingId}
               onDelete={handleDelete}
             />
@@ -258,9 +260,9 @@ export default function DashboardPage() {
         {/* The full log lives on its own page now. */}
         <button type="button" className="coin-history-btn" onClick={() => navigate('/history')}>
           <span className="coin-history-btn__text">
-            <span className="coin-history-btn__title">history</span>
+            <span className="coin-history-btn__title">History</span>
             <span className="coin-history-btn__sub">
-              all khatas · {transactions.length} {transactions.length === 1 ? 'entry' : 'entries'}
+              all kharch · {transactions.length} {transactions.length === 1 ? 'entry' : 'entries'}
             </span>
           </span>
           <span className="coin-history-btn__arrow" aria-hidden="true">

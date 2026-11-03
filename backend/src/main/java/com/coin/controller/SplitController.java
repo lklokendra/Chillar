@@ -151,6 +151,16 @@ public class SplitController {
         return splitService.recordSettlement(currentUser(userDetails), groupId, request);
     }
 
+    @PutMapping("/groups/{groupId}/settlements/{settlementId}")
+    public ResponseEntity<SplitSettlementResponse> updateSettlement(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable Long groupId,
+            @PathVariable Long settlementId,
+            @Valid @RequestBody SettlementRequest request) {
+        return ResponseEntity.ok(
+                splitService.updateSettlement(currentUser(userDetails), groupId, settlementId, request));
+    }
+
     @DeleteMapping("/groups/{groupId}/settlements/{settlementId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteSettlement(@AuthenticationPrincipal UserDetails userDetails,

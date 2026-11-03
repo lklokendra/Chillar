@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.coin.dto.KhataResponse;
+import com.coin.dto.KharchResponse;
 import com.coin.dto.TransactionResponse;
 import com.coin.entity.Category;
 import com.coin.entity.Transaction;
@@ -51,20 +51,20 @@ public class TransactionController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/khatas")
-    public ResponseEntity<List<KhataResponse>> getKhatas(@AuthenticationPrincipal UserDetails userDetails) {
+    @GetMapping("/kharch")
+    public ResponseEntity<List<KharchResponse>> getKharch(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userRepository.findByEmailIgnoreCase(userDetails.getUsername()).orElseThrow();
         List<Category> categories = categoryRepository.findByUserOrderByCreatedAtAsc(user);
         
-        List<KhataResponse> responses = new ArrayList<>();
+        List<KharchResponse> responses = new ArrayList<>();
         
         // Add #all
         BigDecimal totalAll = transactionRepository.sumAmountByUser(user);
-        responses.add(new KhataResponse(null, "all", totalAll, "mint"));
+        responses.add(new KharchResponse(null, "all", totalAll, "mint"));
         
         for (Category cat : categories) {
             BigDecimal total = transactionRepository.sumAmountByUserAndCategory(user, cat);
-            responses.add(new KhataResponse(cat.getId(), cat.getName(), total, cat.getColor()));
+            responses.add(new KharchResponse(cat.getId(), cat.getName(), total, cat.getColor()));
         }
         
         return ResponseEntity.ok(responses);

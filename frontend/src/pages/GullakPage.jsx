@@ -15,7 +15,7 @@ import '../styles/gullak.css'
 /**
  * The gullak dashboard: category-wise savings.
  *
- * Entries are typed straight into the box exactly like a khata entry — numbers
+ * Entries are typed straight into the box exactly like a kharch entry — numbers
  * are the amount, words are the note and a hashtag names the savings goal. The
  * hashtag creates the goal the first time it is used and files the money under
  * it every time after that, so a goal's balance is always just the sum of the
@@ -63,7 +63,7 @@ export default function GullakPage() {
     load()
   }, [load])
 
-  // The same parser the khata box uses; here the hashtag means "savings goal".
+  // The same parser the kharch box uses; here the hashtag means "savings goal".
   const preview = parseEntry(entry, { missingAmount: MISSING_GULLAK_AMOUNT, singleTag: true })
 
   async function submit(direction) {
@@ -190,7 +190,7 @@ export default function GullakPage() {
     <div className="coin-page">
       <TopBar />
 
-      <h1 className="coin-page__title">gullak</h1>
+      <h1 className="coin-page__title">Gullak</h1>
       <p className="coin-page__subtitle">
         category-wise savings — every hashtag you write becomes its own goal.
       </p>
